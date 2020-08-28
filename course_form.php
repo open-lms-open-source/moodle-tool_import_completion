@@ -1,0 +1,93 @@
+<?php
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once $CFG->libdir.'/formslib.php';
+
+class admin_import_completion_form extends moodleform {
+    function definition () {
+        global $DB;
+        $mform = $this->_form;
+
+        $mform->addElement('header', 'settingsheader', get_string('upload'));
+
+        $choices = array(0 => 'Completions', 1 => 'Grades');
+        $mform->addElement('select', 'importing', get_string('importing', 'tool_import_completion'), $choices);
+
+        $mform->addElement('filepicker', 'coursecompletionfile', get_string('file'));
+        $mform->addRule('coursecompletionfile', null, 'required');
+
+        $choices = csv_import_reader::get_delimiter_list();
+        $mform->addElement('select', 'delimiter_name', get_string('csvdelimiter', 'tool_import_completion'), $choices);
+        if (array_key_exists('cfg', $choices)) {
+            $mform->setDefault('delimiter_name', 'cfg');
+        } else if (get_string('listsep', 'langconfig') == ';') {
+            $mform->setDefault('delimiter_name', 'semicolon');
+        } else {
+            $mform->setDefault('delimiter_name', 'comma');
+        }
+
+        $choices = core_text::get_encodings();
+        $mform->addElement('select', 'encoding', get_string('encoding', 'tool_import_completion'), $choices);
+        $mform->setDefault('encoding', 'UTF-8');
+
+        $choices = array('10'=>10, '20'=>20, '100'=>100, '1000'=>1000, '100000'=>100000);
+        $mform->addElement('select', 'previewrows', get_string('rowpreviewnum', 'tool_import_completion'), $choices);
+        $mform->setType('previewrows', PARAM_INT);
+
+        $choices = $this->getAvailableProperties();
+        $mform->addElement('select', 'mapping', get_string('mapping', 'tool_import_completion'), $choices);
+        $mform->setDefault('mapping', 'userid');
+
+        $dateformat = array('d/m/Y' => 'd/m/y 30/01/2019',
+                            'm/d/Y' => 'm/d/y 01/30/2019',
+                            'd-m-Y' => 'd-m-y 30-01-2019',
+                            'm-d-Y' => 'm-d-y 01-30-2019',
+                            'Y-m-d' => 'Y-m-d 2019-01-01',
+                            'Y/m/d' => 'Y/m/d 2019/01/01',
+                            'timestamp' => 'timestamp');
+        $mform->addElement('select', 'dateformat', get_string('dateformat', 'tool_import_completion'), $dateformat);
+
+        $this->add_action_buttons(false, get_string('importcompletion', 'tool_import_completion'));
+    }
+
+    function getAvailableProperties() { // Will also be used by view to generate available options.
+        global $CFG, $DB;
+
+        $user = user_get_default_fields();
+        $pfields = profile_get_custom_fields();
+
+        $blacklist = self::getBlacklist();
+        $choices = array();
+        $choices['userid'] = 'userid';
+        foreach ($blacklist as $key) { // Remove Blacklisted Elements.
+            $unset = array_search($key, $user);
+            unset($user[$unset]);
+        }
+
+        foreach($user as $u){
+            $choices[$u] = $u;
+        }
+        foreach($pfields as $p){
+            $p = 'profile_field_'.$p->shortname;
+            $choices[$p] = $p;
+        }
+        return $choices; // Return key array to protect data and ensure conformity in knockoutjs
+    }
+
+    function getBlacklist() { // CAN also be used by the view to show which fields are not accessible.
+        $blacklist = array();
+        $blacklist[] = 'password';
+        $blacklist[] = 'mnethostid';
+        $blacklist[] = 'timemodified';
+        $blacklist[] = 'id';
+        $blacklist[] = 'auth';
+        $blacklist[] = 'emailstop';
+        $blacklist[] = 'suspended';
+        $blacklist[] = 'confirmed';
+        $blacklist[] = 'firstname';
+        $blacklist[] = 'lastname';
+        return $blacklist;
+    }
+}
+

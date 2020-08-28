@@ -1,0 +1,106 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template tool_import_completion/results
+
+    This template renders the main content area for the dashboard block.
+
+    Example context (json):
+    {}
+}}
+<div class="import-completion-container">
+    <h2>{{#str}}results, tool_import_completion{{/str}}</h2>
+    <p>{{{totalrecords}}}</p>
+    <p>{{{totaluploads}}}</p>
+    <p>{{{totalerrors}}}</p>
+    {{#hascompletions}}
+        <div class='center'><h3>{{#str}}coursecompletions, tool_import_completion{{/str}}</h3></div>
+        <div class='form-group'>
+        <table class='table table-striped'>
+            <thead>
+                <tr>
+                    <th>{{#str}}userid, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}courseid, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}timecompleted, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}reaggregate, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}action, tool_import_completion{{/str}}</th>
+                </tr>
+            </thead>
+            {{#completions}}
+                <tr>
+                    <td>{{userid}}</td>
+                    <td>{{course}}</td>
+                    <td>{{timecompletedstring}}</td>
+                    <td>{{reaggregate}}</td>
+                    <td>{{type}}</td>
+                </tr>
+            {{/completions}}
+        </table>
+    </div>
+    {{/hascompletions}}
+    {{#hasmodules}}
+    <div class='center'><h3>{{#str}}modulecompletions, tool_import_completion{{/str}}</h3></div>
+    <div class='form-group'>
+        <table class='table table-striped'>
+            <thead>
+            <tr>
+                <th>{{#str}}userid, tool_import_completion{{/str}}</th>
+                <th>{{#str}}coursemoduleid, tool_import_completion{{/str}}</th>
+                <th>{{#str}}completionstate, tool_import_completion{{/str}}</th>
+                <th>{{#str}}viewed, tool_import_completion{{/str}}</th>
+                <th>{{#str}}timecompleted, tool_import_completion{{/str}}</th>
+                <th>{{#str}}action, tool_import_completion{{/str}}</th>
+            </tr>
+            {{#modules}}
+            <tr>
+                <td>{{userid}}</td>
+                <td>{{coursemoduleid}}</td>
+                <td>{{completionstate}}</td>
+                <td>{{viewed}}</td>
+                <td>{{timemodifiedstring}}</td>
+                <td>{{type}}</td>
+            </tr>
+            {{/modules}}
+        </table>
+    </div>
+    {{/hasmodules}}
+    {{#hasgrades}}
+    <div class='center'><h3>{{#str}}grades, tool_import_completion{{/str}}</h3></div>
+    <div class='form-group'>
+        <table class='table table-striped'>
+            <thead>
+                <tr>
+                    <th>{{#str}}userid, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}grade, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}itemid, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}dategraded, tool_import_completion{{/str}}</th>
+                    <th>{{#str}}action, tool_import_completion{{/str}}</th>
+                </tr>
+            </thead>
+            {{#grades}}
+                <tr>
+                    <td>{{userid}}</td>
+                    <td>{{finalgrade}}</td>
+                    <td>{{itemid}}</td>
+                    <td>{{timecreatedstring}}</td>
+                    <td>{{type}}</td>
+                </tr>
+            {{/grades}}
+        </table>
+    </div>
+    {{/hasgrades}}
+</div>
