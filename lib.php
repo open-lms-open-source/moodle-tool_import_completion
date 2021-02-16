@@ -107,6 +107,19 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
 
             }
 
+            if ($key == 'timestarted' && !empty($value)) {
+                if ($dateformat == 'timestamp') {
+                    $timestarted = $value;
+                } else {
+                    $timezone = new DateTimeZone($CFG->timezone);
+                    $timestarted = DateTime::createFromFormat($dateformat, $value);
+                    $timestarted->setTime(0, 0);
+                    $timestarted->setTimezone($timezone);
+                    $timestarted = $timestarted->getTimestamp();
+                }
+
+            }
+
             if ($key == 'dategraded') {
                 if ($dateformat == 'timestamp') {
                     $dategraded = $value;
@@ -155,6 +168,11 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                 $completion = $DB->get_record("course_completions", array('userid' => $userid, 'course' => $course));
                 if ($completion) {
                     $completion->timecompleted = $timecompleted;
+                    if (isset($timestarted)) {
+                        $completion->timestarted = $timestarted;
+                    } else {
+                        $completion->timestarted = !empty($completion->timestarted) ? $completion->timestarted : $timecompleted;
+                    }
                     if($DB->update_record('course_completions', $completion)) {
                         $timecompleted = new DateTime();
                         $timecompleted->setTimestamp($completion->timecompleted);
@@ -171,8 +189,8 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     $courseCompletion = new stdClass();
                     $courseCompletion->userid = $userid;
                     $courseCompletion->course = $course;
-                    $courseCompletion->timeenrolled = time();
-                    $courseCompletion->timestarted = time();
+                    $courseCompletion->timeenrolled = isset($timestarted) ? $timestarted : $timecompleted;
+                    $courseCompletion->timestarted = isset($timestarted) ? $timestarted : $timecompleted;
                     $courseCompletion->timecompleted = $timecompleted;
                     $courseCompletion->reaggregate = 0;
                     if($DB->insert_record('course_completions', $courseCompletion)){
