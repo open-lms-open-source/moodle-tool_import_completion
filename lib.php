@@ -173,6 +173,9 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     } else {
                         $completion->timestarted = !empty($completion->timestarted) ? $completion->timestarted : $timecompleted;
                     }
+                    if (empty($completion->timeenrolled)) {
+                        $completion->timeenrolled = $completion->timestarted;
+                    }
                     if($DB->update_record('course_completions', $completion)) {
                         $timecompleted = new DateTime();
                         $timecompleted->setTimestamp($completion->timecompleted);
