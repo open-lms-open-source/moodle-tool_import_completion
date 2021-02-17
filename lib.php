@@ -238,6 +238,8 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                             array('userid' => $userid, 'coursemoduleid' => $moduleid));
                         if($moduleComletion) {
                             $moduleComletion->timemodified = $timecompleted;
+                            $moduleComletion->completionstate = 1;
+                            $moduleComletion->viewed = 1;
                             if($DB->update_record('course_modules_completion', $moduleComletion)){
                                 $timemodified = new DateTime();
                                 $timemodified->setTimestamp($moduleComletion->timemodified);
