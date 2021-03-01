@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This library includes the functions for import completion.
+ *
+ * @package    admin
+ * @subpackage tool
+ * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
 
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
@@ -14,7 +24,7 @@ function getUserProfileFields(){
             $profilefieldname = 'profile_field_'.$proffield->shortname;
             $PRF_FIELDS[] = $profilefieldname;
             // Re-index $proffields with key as shortname. This will be
-            // used while checking if profile data is key and needs to be converted (eg. menu profile field)
+            // used while checking if profile data is key and needs to be converted (eg. menu profile field).
             $proffields[$profilefieldname] = $proffield;
             unset($proffields[$key]);
         }
@@ -50,10 +60,9 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                 if (strpos($mapping, 'profile_field_') !== false) {
                     $shortname = substr($mapping, 14);
                     $user = $DB->get_record_sql("SELECT U.* 
-                                                            FROM {user} U 
-                                                                JOIN {user_info_data} UID ON UID.userid = U.id 
-                                                                JOIN {user_info_field} UIF ON UIF.id = UID.fieldid 
-                                                                    WHERE UIF.shortname = ? AND UID.data = ?", array($shortname, $value));
+                                                  FROM {user} U JOIN {user_info_data} UID ON UID.userid = U.id 
+                                                  JOIN {user_info_field} UIF ON UIF.id = UID.fieldid 
+                                                  WHERE UIF.shortname = ? AND UID.data = ?", array($shortname, $value));
                     if ($user) {
                         $userid = $user->id;
                     } else {
@@ -72,8 +81,6 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $error = true;
                     }
                 }
-
-
             }
             if ($key == 'course') {
                 $courses = $DB->get_record("course", array('id' => $value));
@@ -91,7 +98,6 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $error = true;
                     }
                 }
-
             }
 
             if ($key == 'timecompleted') {
@@ -162,7 +168,6 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
         }
 
         if (!$error) {
-
             // Logic for either course completion or grade.
             if ($dataimport == 0) {
                 $completion = $DB->get_record("course_completions", array('userid' => $userid, 'course' => $course));
@@ -305,7 +310,6 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
     }
 
     purge_all_caches();
-
     return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalUpdated, 'totalerrors' => $totalerror, 'uploadedCompletions' => $uploadedCompletions, 'moduleCompletions' => $uploadedModuleCompletions,
                 'uploadedGrades' => $uploadedGrades, 'totalrecords' => ($linenum-1));
 }
@@ -318,7 +322,7 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
     $linenum = 1;
     $upt->start($importing); // start table
 
-//Modfy the columns for different import.
+    // Modify the columns for different import.
     if ($importing==1){
         $upt->columns = array('line', 'id', 'username', 'firstname', 'lastname', 'moduleid', 'grade', 'dategraded', 'completiondate');
     }
@@ -425,6 +429,5 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
         $linenum++;
 
     }
-
     $upt->close($iid,$filecolumns,$readcount,$mapping,$dateformat, $importing);
 }

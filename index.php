@@ -1,4 +1,20 @@
 <?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
@@ -20,6 +36,8 @@ $dataimport = optional_param('dataimport', 0, PARAM_INT);
 
 admin_externalpage_setup('toolimport_completion');
 require_login();
+
+defined('MOODLE_INTERNAL') || die();
 
 $returnurl = new moodle_url('/admin/tool/import_completion/index.php');
 
@@ -65,15 +83,13 @@ if(!$uploadcompletion){
             $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
 
             // continue to form2
-
         } else {
             echo $OUTPUT->header();
 
             echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'), 'importcompletion', 'tool_import_completion');
-
             $mform->display();
+
             echo $OUTPUT->footer();
-            die;
         }
     } else {
         $cir = new csv_import_reader($iid, 'import_completion');
@@ -88,16 +104,17 @@ if(!$uploadcompletion){
     $renderer = $PAGE->get_renderer('tool_import_completion');
     $total = $uploadedData['totaluploaded'] + $uploadedData['totalupdated'];
     echo $renderer->print_upload_results($uploadedData);
-    echo $OUTPUT->footer();
 
-    die;
+    echo $OUTPUT->footer();
 }
 
+// Only display this if the file has been loaded.
+if(!empty($iid) && !$uploadcompletion) {
 
+    echo $OUTPUT->header();
 
+    displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
 
-echo $OUTPUT->header();
+    echo $OUTPUT->footer();
 
-displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
-
-echo $OUTPUT->footer();
+}
