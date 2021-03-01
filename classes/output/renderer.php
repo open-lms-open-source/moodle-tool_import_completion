@@ -17,8 +17,8 @@
 /**
  * Learnbook Import Completion
  *
- * @package    local_myteam
- * @author     2020 Lupiya, eCreators <lupiya@ecreators.com.au>
+ * @package    tool_import_completion
+ * @author     2020 Lupiya Mujala<lupiya.mujala@ecreators.com.au>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
