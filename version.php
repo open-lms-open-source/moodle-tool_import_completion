@@ -18,7 +18,8 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     tool_import_completion
- * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
+ * @category    admin
+ * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

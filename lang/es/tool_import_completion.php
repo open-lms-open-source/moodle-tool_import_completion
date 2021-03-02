@@ -19,7 +19,7 @@
  *
  * @package     tool_import_completion
  * @category    string
- * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>
+ * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
