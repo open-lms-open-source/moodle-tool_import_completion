@@ -282,13 +282,13 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     $gradeUpload->timemodified = $dategraded;
                     if($DB->insert_record('grade_grades', $gradeUpload)){
                         $datecreated = new DateTime();
-                        $datecreated->setTimestamp($gradeUpload->timecreated);
+                        $datecreated->setTimestamp($gradeUpload->timemodified);
                         $datecreated->setTimeZone(new DateTimeZone($CFG->timezone));
                         $gradeUpload->datecreatedstring = $datecreated->format('d/m/Y');
                         $timemodified = new DateTime();
                         $timemodified->setTimestamp($gradeUpload->timemodified);
                         $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
-                        $gradegrade->timecreatedstring = $timemodified->format('d/m/Y');
+                        $gradeUpload->timecreatedstring = $timemodified->format('d/m/Y');
                         $gradeUpload->type =  'Insert';
                         $uploadedGrades[] = $gradeUpload;
                         $totaluploaded++;
@@ -297,22 +297,41 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     }
                     // Add course module completion if time completed is added.
                     if ($timecompleted>0){
-                        $moduleComletion = new stdClass();
-                        $moduleComletion->coursemoduleid = $moduleid;
-                        $moduleComletion->userid = $userid;
-                        $moduleComletion->completionstate = 1;
-                        $moduleComletion->viewed = 1;
-                        $moduleComletion->timemodified = $timecompleted;
-                        if($DB->insert_record('course_modules_completion', $moduleComletion)){
-                            $timemodified = new DateTime();
-                            $timemodified->setTimestamp($moduleComletion->timemodified);
-                            $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
-                            $moduleComletion->timemodifiedstring = $timemodified->format('d/m/Y');
-                            $moduleComletion->type = 'Insert';
-                            $uploadedModuleCompletions[] = $moduleComletion;
-                            $totaluploaded++;
+                        $moduleComletion = $DB->get_record_sql("SELECT * FROM {course_modules_completion} WHERE userid = :userid AND  coursemoduleid= :coursemoduleid",
+                            array('userid' => $userid, 'coursemoduleid' => $moduleid));
+                        if($moduleComletion) {
+                            $moduleComletion->timemodified = $timecompleted;
+                            $moduleComletion->completionstate = 1;
+                            $moduleComletion->viewed = 1;
+                            if($DB->update_record('course_modules_completion', $moduleComletion)){
+                                $timemodified = new DateTime();
+                                $timemodified->setTimestamp($moduleComletion->timemodified);
+                                $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
+                                $moduleComletion->timemodifiedstring = $timemodified->format('d/m/Y');
+                                $moduleComletion->type = 'Update';
+                                $uploadedModuleCompletions[] = $moduleComletion;
+                                $totaluploaded++;
+                            }else{
+                                $totalerror++;
+                            }
                         }else{
-                            $totalerror++;
+                            $moduleComletion = new stdClass();
+                            $moduleComletion->coursemoduleid = $moduleid;
+                            $moduleComletion->userid = $userid;
+                            $moduleComletion->completionstate = 1;
+                            $moduleComletion->viewed = 1;
+                            $moduleComletion->timemodified = $timecompleted;
+                            if($DB->insert_record('course_modules_completion', $moduleComletion)){
+                                $timemodified = new DateTime();
+                                $timemodified->setTimestamp($moduleComletion->timemodified);
+                                $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
+                                $moduleComletion->timemodifiedstring = $timemodified->format('d/m/Y');
+                                $moduleComletion->type = 'Insert';
+                                $uploadedModuleCompletions[] = $moduleComletion;
+                                $totaluploaded++;
+                            }else{
+                                $totalerror++;
+                            }
                         }
                     }
                 }
