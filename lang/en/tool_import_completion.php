@@ -67,3 +67,4 @@ $string['itemid'] = 'Item ID';
 $string['grades'] = 'Grades';
 $string['modulecompletions'] = 'Course Module Completions';
 $string['coursecompletions'] = 'Course Completions';
+$string['upload_warning'] = 'WARNING: This plugin will override existing grades/completions.';

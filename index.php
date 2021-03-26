@@ -56,7 +56,6 @@ $STD_FIELDS = array('id', //optional record id
                     'grade'
 );
 
-
 $PRF_FIELDS = getUserProfileFields();
 
 if(!$uploadcompletion){
@@ -84,7 +83,13 @@ if(!$uploadcompletion){
 
             // continue to form2
         } else {
+            $PAGE->requires->css('/admin/tool/import_completion/assets/css/style.css');
+
             echo $OUTPUT->header();
+
+            $renderer = $PAGE->get_renderer('tool_import_completion');
+
+            echo $renderer->print_upload_warning();
 
             echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'), 'importcompletion', 'tool_import_completion');
             $mform->display();
@@ -97,11 +102,12 @@ if(!$uploadcompletion){
     }
 
 }else{
+    $renderer = $PAGE->get_renderer('tool_import_completion');
+
     $uploadedData = uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
 
     echo $OUTPUT->header();
 
-    $renderer = $PAGE->get_renderer('tool_import_completion');
     $total = $uploadedData['totaluploaded'] + $uploadedData['totalupdated'];
     echo $renderer->print_upload_results($uploadedData);
 
