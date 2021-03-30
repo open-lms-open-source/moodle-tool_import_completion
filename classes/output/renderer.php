@@ -47,4 +47,10 @@ class renderer  extends plugin_renderer_base{
         ];
         return $this->render_from_template('tool_import_completion/results', $context);
     }
+
+    public function print_upload_warning(){
+
+        $context = [];
+        return $this->render_from_template('tool_import_completion/warning', $context);
+    }
 }
