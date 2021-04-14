@@ -271,6 +271,24 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                             }else{
                                 $totalerror++;
                             }
+                        }else{
+                            $moduleComletion = new stdClass();
+                            $moduleComletion->coursemoduleid = $moduleid;
+                            $moduleComletion->userid = $userid;
+                            $moduleComletion->completionstate = 1;
+                            $moduleComletion->viewed = 1;
+                            $moduleComletion->timemodified = $timecompleted;
+                            if($DB->insert_record('course_modules_completion', $moduleComletion)){
+                                $timemodified = new DateTime();
+                                $timemodified->setTimestamp($moduleComletion->timemodified);
+                                $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
+                                $moduleComletion->timemodifiedstring = $timemodified->format('d/m/Y');
+                                $moduleComletion->type = 'Insert';
+                                $uploadedModuleCompletions[] = $moduleComletion;
+                                $totaluploaded++;
+                            }else{
+                                $totalerror++;
+                            }
                         }
                     }
                 }else{
@@ -336,7 +354,6 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     }
                 }
             }
-            //$totaluploaded++;
         } else {
             $totalerror++;
         }
