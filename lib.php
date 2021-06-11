@@ -70,6 +70,8 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
         $error = false;
         $moduleid = 0;
         foreach ($line as $keynum => $value) {
+            // Get rid of trailing spaces for validation.
+            $value = trim($value);
             $key = $filecolumns[$keynum];
             if ($key == $mapping) {
                 if (strpos($mapping, 'profile_field_') !== false) {
