@@ -68,3 +68,5 @@ $string['grades'] = 'Grades';
 $string['modulecompletions'] = 'Course Module Completions';
 $string['coursecompletions'] = 'Course Completions';
 $string['upload_warning'] = 'WARNING: This plugin will override existing grades/completions.';
+$string['error:nopermission'] = 'The current user has no access to import completion/grades.';
+$string['import_completion:uploadrecords'] = 'Upload completion/grade csv file to override data.';

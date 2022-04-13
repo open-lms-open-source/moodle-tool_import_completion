@@ -18,6 +18,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once $CFG->libdir.'/formslib.php';
+require_once($CFG->dirroot . '/user/lib.php');
 
 class admin_import_completion_form extends moodleform {
     function definition () {
@@ -67,42 +68,12 @@ class admin_import_completion_form extends moodleform {
     }
 
     function getAvailableProperties() { // Will also be used by view to generate available options.
-        global $CFG, $DB;
 
-        $user = user_get_default_fields();
-        $pfields = profile_get_custom_fields();
-
-        $blacklist = self::getBlacklist();
         $choices = array();
         $choices['userid'] = 'userid';
-        foreach ($blacklist as $key) { // Remove Blacklisted Elements.
-            $unset = array_search($key, $user);
-            unset($user[$unset]);
-        }
-
-        foreach($user as $u){
-            $choices[$u] = $u;
-        }
-        foreach($pfields as $p){
-            $p = 'profile_field_'.$p->shortname;
-            $choices[$p] = $p;
-        }
-        return $choices; // Return key array to protect data and ensure conformity in knockoutjs
-    }
-
-    function getBlacklist() { // CAN also be used by the view to show which fields are not accessible.
-        $blacklist = array();
-        $blacklist[] = 'password';
-        $blacklist[] = 'mnethostid';
-        $blacklist[] = 'timemodified';
-        $blacklist[] = 'id';
-        $blacklist[] = 'auth';
-        $blacklist[] = 'emailstop';
-        $blacklist[] = 'suspended';
-        $blacklist[] = 'confirmed';
-        $blacklist[] = 'firstname';
-        $blacklist[] = 'lastname';
-        return $blacklist;
+        $choices['username'] = 'username';
+        $choices['email'] = 'email';
+        return $choices;
     }
 }
 

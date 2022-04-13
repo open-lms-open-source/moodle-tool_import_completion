@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,19 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Plugin version and other meta-data are defined here.
- *
- * @package     tool_import_completion
- * @category    admin
- * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'tool_import_completion';
-$plugin->release = '0.1.0';
-$plugin->version = 2022041000;
-$plugin->requires = 2017111300;
-$plugin->maturity = MATURITY_ALPHA;
+$capabilities = [
+    'tool/import_completion:uploadrecords' => [
+        'captype' => 'write',
+        'riskbitmask' => RISK_SPAM | RISK_PERSONAL,
+        'contextlevel' => CONTEXT_SYSTEM,
+    ],
+];

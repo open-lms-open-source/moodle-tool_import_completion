@@ -68,3 +68,5 @@ $string['itemid'] = 'ID del Item';
 $string['grades'] = 'Calificaciones';
 $string['modulecompletions'] = 'Finalizaciones del módulo del curso';
 $string['coursecompletions'] = 'Finalizaciones del curso';
+$string['error:nopermission'] = 'El usuario no tiene permisos para importar finalizaciones/calificaciones.';
+$string['import_completion:uploadrecords'] = 'Subir archivo csv con finalizaciones/calificaciones para sobreescribir los datos..';

@@ -93,7 +93,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     }
                     $user = $DB->get_record("user", array($map => $value));
                     if ($user) {
-                        $userid = $value;
+                        $userid = $user->id;
                     } else {
                         $error = true;
                     }
@@ -218,13 +218,15 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     $courseCompletion->timestarted = isset($timestarted) ? $timestarted : $timecompleted;
                     $courseCompletion->timecompleted = $timecompleted;
                     $courseCompletion->reaggregate = 0;
-                    if($DB->insert_record('course_completions', $courseCompletion)){
+                    $id = $DB->insert_record('course_completions', $courseCompletion);
+                    if($id){
                         $timecompleted = new DateTime();
                         $timecompleted->setTimestamp($courseCompletion->timecompleted);
                         $timecompleted->setTimeZone(new DateTimeZone($CFG->timezone));
                         $courseCompletion->timecompletedstring = $timecompleted->format('d/m/Y');
                         $courseCompletion->type = 'Insert';
                         $uploadedCompletions[] = $courseCompletion;
+                        $courseCompletion->id = $id;
                         $totaluploaded++;
                         \core\event\course_completed::create_from_completion($courseCompletion)->trigger();
                     }else{
@@ -364,7 +366,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
 
     purge_all_caches();
     return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalUpdated, 'totalerrors' => $totalerror, 'uploadedCompletions' => $uploadedCompletions, 'moduleCompletions' => $uploadedModuleCompletions,
-                'uploadedGrades' => $uploadedGrades, 'totalrecords' => ($linenum-1));
+        'uploadedGrades' => $uploadedGrades, 'totalrecords' => ($linenum-1));
 }
 
 function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount){
@@ -387,6 +389,7 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
         foreach ($line as $keynum => $value) {
 
             $key = $filecolumns[$keynum];
+            $user = false;
             if($key == $mapping){
                 if(strpos($mapping, 'profile_field_')!== false){
                     $shortname = substr($mapping, 14);

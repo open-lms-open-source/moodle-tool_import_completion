@@ -25,7 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
+if (has_capability('tool/import_completion:uploadrecords', context_system::instance())) {
     $ADMIN->add('courses', new admin_externalpage('toolimport_completion',
-        get_string('importcompletion', 'tool_import_completion'), "$CFG->wwwroot/$CFG->admin/tool/import_completion/index.php"));
+        get_string('importcompletion', 'tool_import_completion'),
+        new moodle_url('/admin/tool/import_completion/index.php'),
+        array('tool/import_completion:uploadrecords')));
 }

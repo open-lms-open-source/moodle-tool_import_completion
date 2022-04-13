@@ -22,7 +22,7 @@ require_once('course_form.php');
 require_once('locallib.php');
 require_once('lib.php');
 
-use tool_import_completion\output;
+defined('MOODLE_INTERNAL') || die();
 
 $iid         = optional_param('iid', '', PARAM_INT);
 $previewrows = optional_param('previewrows', 10, PARAM_INT);
@@ -34,26 +34,30 @@ $dateformat = optional_param('dateformat', null, PARAM_RAW);
 $importing = optional_param('importing', 10, PARAM_INT);
 $dataimport = optional_param('dataimport', 0, PARAM_INT);
 
-admin_externalpage_setup('toolimport_completion');
 require_login();
+$context = context_system::instance();
+require_capability('tool/import_completion:uploadrecords', $context);
+$managerurl = new moodle_url('/admin/tool/import_completion/index.php');
 
-defined('MOODLE_INTERNAL') || die();
-
-$returnurl = new moodle_url('/admin/tool/import_completion/index.php');
+$PAGE->set_context($context);
+$PAGE->set_url($managerurl);
+$PAGE->set_pagelayout('admin');
 
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
 $STD_FIELDS = array('id', //optional record id
-                    'userid', //required moodle user id
-                    'course', //required moodle course id for completion record
-                    'timeenrolled',
-                    'timestarted',
-                    'timecompleted', //required timecompleted in timestamp format
-                    'reaggregate',
-                    'dategraded',
-                    'moduleid',
-                    'grade'
+    'userid', //required moodle user id
+    'course', //required moodle course id for completion record
+    'email',
+    'username',
+    'timeenrolled',
+    'timestarted',
+    'timecompleted', //required timecompleted in timestamp format
+    'reaggregate',
+    'dategraded',
+    'moduleid',
+    'grade'
 );
 
 $PRF_FIELDS = getUserProfileFields();
@@ -75,11 +79,11 @@ if(!$uploadcompletion){
             unset($content);
 
             if (!is_null($csvloaderror)) {
-                print_error('csvloaderror', '', $returnurl, $csvloaderror);
+                print_error('csvloaderror', '', $managerurl, $csvloaderror);
             }
 
             // test if columns ok
-            $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
+            $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
 
             // continue to form2
         } else {
@@ -98,7 +102,7 @@ if(!$uploadcompletion){
         }
     } else {
         $cir = new csv_import_reader($iid, 'import_completion');
-        $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
+        $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
     }
 
 }else{
