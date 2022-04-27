@@ -32,10 +32,11 @@ use plugin_renderer_base;
 
 class renderer  extends plugin_renderer_base{
 
-    public function print_upload_results($data){
+    public function print_upload_results($data) {
 
         $context = [
-            'totaluploads' => get_string('totaluploads', 'tool_import_completion', ($data['totaluploaded'] + $data['totalupdated'])),
+            'totaluploads' => get_string('totaluploads', 'tool_import_completion',
+                ($data['totaluploaded'] + $data['totalupdated'])),
             'totalerrors' => get_string('totalerrors', 'tool_import_completion', $data['totalerrors']),
             'completions' => $data['uploadedCompletions'],
             'modules' => $data['moduleCompletions'],
@@ -48,7 +49,7 @@ class renderer  extends plugin_renderer_base{
         return $this->render_from_template('tool_import_completion/results', $context);
     }
 
-    public function print_upload_warning(){
+    public function print_upload_warning() {
 
         $context = [];
         return $this->render_from_template('tool_import_completion/warning', $context);

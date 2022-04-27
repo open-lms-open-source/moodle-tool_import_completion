@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-function getUserProfileFields(){
+function getUserProfileFields() {
     global $DB;
 
     $PRF_FIELDS = array();
@@ -48,7 +47,7 @@ function getUserProfileFields(){
     return $PRF_FIELDS;
 }
 
-function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount){
+function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount) {
     global $DB, $CFG;
     $filecolumns = explode (',', $filecolumns);
     $linenum = 1;
@@ -76,9 +75,9 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
             if ($key == $mapping) {
                 if (strpos($mapping, 'profile_field_') !== false) {
                     $shortname = substr($mapping, 14);
-                    $user = $DB->get_record_sql("SELECT U.* 
-                                                  FROM {user} U JOIN {user_info_data} UID ON UID.userid = U.id 
-                                                  JOIN {user_info_field} UIF ON UIF.id = UID.fieldid 
+                    $user = $DB->get_record_sql("SELECT U.*
+                                                  FROM {user} U JOIN {user_info_data} UID ON UID.userid = U.id
+                                                  JOIN {user_info_field} UIF ON UIF.id = UID.fieldid
                                                   WHERE UIF.shortname = ? AND UID.data = ?", array($shortname, $value));
                     if ($user) {
                         $userid = $user->id;
@@ -103,7 +102,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                 $courses = $DB->get_record("course", array('id' => $value));
                 if ($courses) {
                     $context = context_course::instance($courses->id);
-                    if (!is_enrolled($context, $user) && $dataimport==0) {
+                    if (!is_enrolled($context, $user) && $dataimport == 0) {
                         $error = true;
                         $course = $value. " [Not enrolled]";
                     } else {
@@ -111,7 +110,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     }
 
                 } else {
-                    if($dataimport==0){
+                    if ($dataimport == 0) {
                         $error = true;
                     }
                 }
@@ -157,22 +156,23 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
 
             if ($key == 'moduleid') {
                 $coursemodule = $DB->get_record("course_modules", array('id' => $value));
-                if($coursemodule){
+                if ($coursemodule) {
                     $module = $DB->get_record("modules", array('id' => $coursemodule->module));
-                    if($module){
-                        $grade = $DB->get_record("grade_items", array('itemmodule' => $module->name, 'iteminstance' => $coursemodule->instance));
-                        if($grade){
+                    if ($module) {
+                        $grade = $DB->get_record("grade_items",
+                            array('itemmodule' => $module->name, 'iteminstance' => $coursemodule->instance));
+                        if ($grade) {
                             $gradeitem = $grade->id;
                             $moduleid = $value;
-                        }else{
+                        } else {
                             $error = true;
                             $gradeitem = 'Grade Item not found';
                         }
-                    }else{
+                    } else {
                         $error = true;
                         $gradeitem = 'Grade Item not found';
                     }
-                }else{
+                } else {
                     $gradeitem = 'Grade Item not found';
                     $error = true;
                 }
@@ -198,7 +198,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     if (empty($completion->timeenrolled)) {
                         $completion->timeenrolled = $completion->timestarted;
                     }
-                    if($DB->update_record('course_completions', $completion)) {
+                    if ($DB->update_record('course_completions', $completion)) {
                         $timecompleted = new DateTime();
                         $timecompleted->setTimestamp($completion->timecompleted);
                         $timecompleted->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -207,7 +207,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $uploadedCompletions[] = $completion;
                         $totalUpdated++;
                         \core\event\course_completed::create_from_completion($completion)->trigger();
-                    }else{
+                    } else {
                         $totalerror++;
                     }
                 } else {
@@ -219,7 +219,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                     $courseCompletion->timecompleted = $timecompleted;
                     $courseCompletion->reaggregate = 0;
                     $id = $DB->insert_record('course_completions', $courseCompletion);
-                    if($id){
+                    if ($id) {
                         $timecompleted = new DateTime();
                         $timecompleted->setTimestamp($courseCompletion->timecompleted);
                         $timecompleted->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -229,19 +229,23 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $courseCompletion->id = $id;
                         $totaluploaded++;
                         \core\event\course_completed::create_from_completion($courseCompletion)->trigger();
-                    }else{
+                    } else {
                         $totalerror++;
                     }
                 }
-            }else{
-                $gradegrade = $DB->get_record_sql("SELECT GG.* FROM {grade_grades} GG INNER JOIN {grade_items} GI on GI.id = GG.itemid WHERE 
-                                                            GG.itemid = :itemid AND  GG.userid = :userid", array('userid' => $userid, 'itemid' => $gradeitem));
+            } else {
+                $gradegrade = $DB->get_record_sql("SELECT GG.*
+                                                        FROM {grade_grades} GG
+                                                        INNER JOIN {grade_items} GI on GI.id = GG.itemid
+                                                        WHERE GG.itemid = :itemid
+                                                        AND GG.userid = :userid",
+                    array('userid' => $userid, 'itemid' => $gradeitem));
                 if ($gradegrade) {
 
                     $gradegrade->finalgrade = $grade;
                     $gradegrade->timecreated = $dategraded;
                     $gradegrade->timemodified = $dategraded;
-                    if($DB->update_record('grade_grades', $gradegrade)){
+                    if ($DB->update_record('grade_grades', $gradegrade)) {
                         $timecreated = new DateTime();
                         $timecreated->setTimestamp($gradegrade->timecreated);
                         $timecreated->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -253,36 +257,39 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $gradegrade->type = 'Update';
                         $uploadedGrades[] = $gradegrade;
                         $totalUpdated++;
-                    }else{
+                    } else {
                         $totalerror++;
                     }
                     // Update course module completion if time completed is added.
-                    if ($timecompleted>0){
-                        $moduleComletion = $DB->get_record_sql("SELECT * FROM {course_modules_completion} WHERE userid = :userid AND  coursemoduleid= :coursemoduleid",
+                    if ($timecompleted > 0) {
+                        $moduleComletion = $DB->get_record_sql("SELECT *
+                                                                    FROM {course_modules_completion}
+                                                                    WHERE userid = :userid
+                                                                    AND coursemoduleid= :coursemoduleid",
                             array('userid' => $userid, 'coursemoduleid' => $moduleid));
-                        if($moduleComletion) {
+                        if ($moduleComletion) {
                             $moduleComletion->timemodified = $timecompleted;
                             $moduleComletion->completionstate = 1;
                             $moduleComletion->viewed = 1;
-                            if($DB->update_record('course_modules_completion', $moduleComletion)){
+                            if ($DB->update_record('course_modules_completion', $moduleComletion)) {
                                 $timemodified = new DateTime();
                                 $timemodified->setTimestamp($moduleComletion->timemodified);
                                 $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
                                 $moduleComletion->timemodifiedstring = $timemodified->format('d/m/Y');
-                                $moduleComletion->type =  'Update';
+                                $moduleComletion->type = 'Update';
                                 $uploadedModuleCompletions[] = $moduleComletion;
                                 $totalUpdated++;
-                            }else{
+                            } else {
                                 $totalerror++;
                             }
-                        }else{
+                        } else {
                             $moduleComletion = new stdClass();
                             $moduleComletion->coursemoduleid = $moduleid;
                             $moduleComletion->userid = $userid;
                             $moduleComletion->completionstate = 1;
                             $moduleComletion->viewed = 1;
                             $moduleComletion->timemodified = $timecompleted;
-                            if($DB->insert_record('course_modules_completion', $moduleComletion)){
+                            if ($DB->insert_record('course_modules_completion', $moduleComletion)) {
                                 $timemodified = new DateTime();
                                 $timemodified->setTimestamp($moduleComletion->timemodified);
                                 $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -290,19 +297,19 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                                 $moduleComletion->type = 'Insert';
                                 $uploadedModuleCompletions[] = $moduleComletion;
                                 $totaluploaded++;
-                            }else{
+                            } else {
                                 $totalerror++;
                             }
                         }
                     }
-                }else{
+                } else {
                     $gradeUpload = new stdClass();
                     $gradeUpload->userid = $userid;
                     $gradeUpload->itemid = $gradeitem;
                     $gradeUpload->finalgrade = $grade;
                     $gradeUpload->timecreated = $dategraded;
                     $gradeUpload->timemodified = $dategraded;
-                    if($DB->insert_record('grade_grades', $gradeUpload)){
+                    if ($DB->insert_record('grade_grades', $gradeUpload)) {
                         $datecreated = new DateTime();
                         $datecreated->setTimestamp($gradeUpload->timemodified);
                         $datecreated->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -311,21 +318,24 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                         $timemodified->setTimestamp($gradeUpload->timemodified);
                         $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
                         $gradeUpload->timecreatedstring = $timemodified->format('d/m/Y');
-                        $gradeUpload->type =  'Insert';
+                        $gradeUpload->type = 'Insert';
                         $uploadedGrades[] = $gradeUpload;
                         $totaluploaded++;
-                    }else{
+                    } else {
                         $totalerror++;
                     }
                     // Add course module completion if time completed is added.
-                    if ($timecompleted>0){
-                        $moduleComletion = $DB->get_record_sql("SELECT * FROM {course_modules_completion} WHERE userid = :userid AND  coursemoduleid= :coursemoduleid",
+                    if ($timecompleted > 0) {
+                        $moduleComletion = $DB->get_record_sql("SELECT *
+                                                                    FROM {course_modules_completion}
+                                                                    WHERE userid = :userid
+                                                                    AND coursemoduleid= :coursemoduleid",
                             array('userid' => $userid, 'coursemoduleid' => $moduleid));
-                        if($moduleComletion) {
+                        if ($moduleComletion) {
                             $moduleComletion->timemodified = $timecompleted;
                             $moduleComletion->completionstate = 1;
                             $moduleComletion->viewed = 1;
-                            if($DB->update_record('course_modules_completion', $moduleComletion)){
+                            if ($DB->update_record('course_modules_completion', $moduleComletion)) {
                                 $timemodified = new DateTime();
                                 $timemodified->setTimestamp($moduleComletion->timemodified);
                                 $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -333,17 +343,17 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                                 $moduleComletion->type = 'Update';
                                 $uploadedModuleCompletions[] = $moduleComletion;
                                 $totaluploaded++;
-                            }else{
+                            } else {
                                 $totalerror++;
                             }
-                        }else{
+                        } else {
                             $moduleComletion = new stdClass();
                             $moduleComletion->coursemoduleid = $moduleid;
                             $moduleComletion->userid = $userid;
                             $moduleComletion->completionstate = 1;
                             $moduleComletion->viewed = 1;
                             $moduleComletion->timemodified = $timecompleted;
-                            if($DB->insert_record('course_modules_completion', $moduleComletion)){
+                            if ($DB->insert_record('course_modules_completion', $moduleComletion)) {
                                 $timemodified = new DateTime();
                                 $timemodified->setTimestamp($moduleComletion->timemodified);
                                 $timemodified->setTimeZone(new DateTimeZone($CFG->timezone));
@@ -351,7 +361,7 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
                                 $moduleComletion->type = 'Insert';
                                 $uploadedModuleCompletions[] = $moduleComletion;
                                 $totaluploaded++;
-                            }else{
+                            } else {
                                 $totalerror++;
                             }
                         }
@@ -365,21 +375,23 @@ function uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $rea
     }
 
     purge_all_caches();
-    return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalUpdated, 'totalerrors' => $totalerror, 'uploadedCompletions' => $uploadedCompletions, 'moduleCompletions' => $uploadedModuleCompletions,
-        'uploadedGrades' => $uploadedGrades, 'totalrecords' => ($linenum-1));
+    return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalUpdated, 'totalerrors' => $totalerror,
+        'uploadedCompletions' => $uploadedCompletions, 'moduleCompletions' => $uploadedModuleCompletions,
+        'uploadedGrades' => $uploadedGrades, 'totalrecords' => ($linenum - 1));
 }
 
-function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount){
+function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount) {
     global $DB, $CFG;
 
     $cir->init();
     $upt = new completions_uu_progress_tracker();
     $linenum = 1;
-    $upt->start($importing); // start table
+    $upt->start($importing); // Start table.
 
     // Modify the columns for different import.
-    if ($importing==1){
-        $upt->columns = array('line', 'id', 'username', 'firstname', 'lastname', 'moduleid', 'grade', 'dategraded', 'completiondate');
+    if ($importing == 1) {
+        $upt->columns = array('line', 'id', 'username', 'firstname', 'lastname', 'moduleid',
+            'grade', 'dategraded', 'completiondate');
     }
     while ($linenum <= $previewrows and $line = $cir->next()) {
 
@@ -390,43 +402,43 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
 
             $key = $filecolumns[$keynum];
             $user = false;
-            if($key == $mapping){
-                if(strpos($mapping, 'profile_field_')!== false){
+            if ($key == $mapping) {
+                if (strpos($mapping, 'profile_field_') !== false) {
                     $shortname = substr($mapping, 14);
-                    $user = $DB->get_record_sql("SELECT U.* 
-                                                    FROM {user} U 
-                                                        JOIN {user_info_data} UID ON UID.userid = U.id 
-                                                        JOIN {user_info_field} UIF ON UIF.id = UID.fieldid 
+                    $user = $DB->get_record_sql("SELECT U.*
+                                                    FROM {user} U
+                                                        JOIN {user_info_data} UID ON UID.userid = U.id
+                                                        JOIN {user_info_field} UIF ON UIF.id = UID.fieldid
                                                         WHERE UIF.shortname = ? AND UID.data = ?", array($shortname, $value));
-                }else{
-                    if($mapping == 'userid'){
+                } else {
+                    if ($mapping == 'userid') {
                         $map = 'id';
-                    }else{
+                    } else {
                         $map = $mapping;
                     }
-                    $user = $DB->get_record("user",array($map => $value));
+                    $user = $DB->get_record("user", array($map => $value));
                 }
-                if($user){
+                if ($user) {
 
                     $upt->track('id', $user->id, 'normal', true);
                     $upt->track('username', $user->username, 'normal', true);
                     $upt->track('firstname', $user->firstname, 'normal', true);
                     $upt->track('lastname', $user->lastname, 'normal', true);
-                }else{
+                } else {
                     $upt->track('status', get_string('usernotfound', 'tool_import_completion'), 'normal');
                 }
             }
-            if($key == 'course'){
-                $course = $DB->get_record("course",array('id' => $value));
-                if($course){
+            if ($key == 'course') {
+                $course = $DB->get_record("course", array('id' => $value));
+                if ($course) {
                     $context = context_course::instance($course->id);
-                    if(!is_enrolled($context, $user)){
+                    if (!is_enrolled($context, $user)) {
                         $upt->track('status', get_string('usernotenrolled', 'tool_import_completion'), 'normal');
-                    }else{
+                    } else {
                         $upt->track($key, $course->fullname, 'normal');
                     }
 
-                }else{
+                } else {
                     $upt->track('status', get_string('coursenotfound', 'tool_import_completion'), 'normal');
                 }
             }
@@ -442,7 +454,7 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
                 }
 
             }
-            if ($importing==1) {
+            if ($importing == 1) {
                 if ($key == 'dategraded') {
                     if ($dateformat == 'timestamp') {
                         $upt->track('dategraded', userdate($value), 'normal', false);
@@ -463,19 +475,20 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
                 if ($key == 'moduleid') {
                     $gradeitem = '';
                     $coursemodule = $DB->get_record("course_modules", array('id' => $value));
-                    if($coursemodule){
+                    if ($coursemodule) {
                         $module = $DB->get_record("modules", array('id' => $coursemodule->module));
-                        if($module){
-                            $grade = $DB->get_record("grade_items", array('itemmodule' => $module->name, 'iteminstance' => $coursemodule->instance));
-                            if($grade){
+                        if ($module) {
+                            $grade = $DB->get_record("grade_items",
+                                array('itemmodule' => $module->name, 'iteminstance' => $coursemodule->instance));
+                            if ($grade) {
                                 $gradeitem = $grade->itemname;
-                            }else{
+                            } else {
                                 $gradeitem = 'Grade Item not found';
                             }
-                        }else{
+                        } else {
                             $gradeitem = 'Grade Item not found';
                         }
-                    }else{
+                    } else {
                         $gradeitem = 'Grade Item not found';
                     }
                     $upt->track('moduleid', $gradeitem, 'normal', false);
@@ -485,5 +498,5 @@ function displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping,
         $linenum++;
 
     }
-    $upt->close($iid,$filecolumns,$readcount,$mapping,$dateformat, $importing);
+    $upt->close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing);
 }

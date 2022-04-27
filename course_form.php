@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -17,11 +16,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->libdir.'/formslib.php';
+require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 
 class admin_import_completion_form extends moodleform {
-    function definition () {
+    public function definition () {
         global $DB;
         $mform = $this->_form;
 
@@ -47,7 +46,7 @@ class admin_import_completion_form extends moodleform {
         $mform->addElement('select', 'encoding', get_string('encoding', 'tool_import_completion'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
 
-        $choices = array('10'=>10, '20'=>20, '100'=>100, '1000'=>1000, '100000'=>100000);
+        $choices = array('10' => 10, '20' => 20, '100' => 100, '1000' => 1000, '100000' => 100000);
         $mform->addElement('select', 'previewrows', get_string('rowpreviewnum', 'tool_import_completion'), $choices);
         $mform->setType('previewrows', PARAM_INT);
 
@@ -67,7 +66,8 @@ class admin_import_completion_form extends moodleform {
         $this->add_action_buttons(false, get_string('importcompletion', 'tool_import_completion'));
     }
 
-    function getAvailableProperties() { // Will also be used by view to generate available options.
+    private function getAvailableProperties() {
+        // Will also be used by view to generate available options.
 
         $choices = array();
         $choices['userid'] = 'userid';

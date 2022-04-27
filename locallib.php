@@ -56,7 +56,8 @@ define('COMPLETIONS_UU_PWRESET_ALL', 2);
  */
 class completions_uu_progress_tracker {
     private $_row;
-    public $columns = array('line', 'id', 'username', 'firstname', 'lastname', 'course', 'completiondate','status', 'grade', 'moduleid', 'dategraded');
+    public $columns = array('line', 'id', 'username', 'firstname', 'lastname', 'course',
+        'completiondate', 'status', 'grade', 'moduleid', 'dategraded');
 
 
     /**
@@ -66,7 +67,8 @@ class completions_uu_progress_tracker {
     public function start($importing = 0) {
         $ci = 0;
         echo '<form action="#" method="post">';
-        echo '<table id="uuresults" class="generaltable boxaligncenter flexible-wrap" summary="'.get_string('uploadusersresult', 'tool_uploaduser').'">';
+        echo '<table id="uuresults" class="generaltable boxaligncenter flexible-wrap" summary="' .
+            get_string('uploadusersresult', 'tool_uploaduser').'">';
         echo '<tr class="heading r0">';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('uucsvline', 'tool_import_completion').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">ID</th>';
@@ -75,13 +77,15 @@ class completions_uu_progress_tracker {
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('lastname').'</th>';
         if ($importing == 0) {
             echo '<th class="header c'.$ci++.'" scope="col">'.get_string('course').'</th>';
-            echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('completiondate', 'tool_import_completion') . '</th>';
+            echo '<th class="header c' . $ci++ . '" scope="col">' .
+                get_string('completiondate', 'tool_import_completion') . '</th>';
             echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('status', 'tool_import_completion') . '</th>';
-        }else{
+        } else {
             echo '<th class="header c'.$ci++.'" scope="col">'.get_string('coursemodule', 'tool_import_completion').'</th>';
             echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('grade', 'tool_import_completion') . '</th>';
             echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('dategraded', 'tool_import_completion') . '</th>';
-            echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('completiondate', 'tool_import_completion') . '</th>';
+            echo '<th class="header c' . $ci++ . '" scope="col">' .
+                get_string('completiondate', 'tool_import_completion') . '</th>';
         }
 
         echo '</tr>';
@@ -94,18 +98,18 @@ class completions_uu_progress_tracker {
      */
     public function flush() {
         if (empty($this->_row) or empty($this->_row['line']['normal'])) {
-            // Nothing to print - each line has to have at least number
+            // Nothing to print - each line has to have at least number.
             $this->_row = array();
             foreach ($this->columns as $col) {
-                $this->_row[$col] = array('normal'=>'', 'info'=>'', 'warning'=>'', 'error'=>'');
+                $this->_row[$col] = array('normal' => '', 'info' => '', 'warning' => '', 'error' => '');
             }
             return;
         }
         $ci = 0;
         $ri = 1;
         echo '<tr class="r'.$ri.'">';
-        foreach ($this->_row as $key=>$field) {
-            foreach ($field as $type=>$content) {
+        foreach ($this->_row as $key => $field) {
+            foreach ($field as $type => $content) {
                 if ($field[$type] !== '') {
                     $field[$type] = '<span class="uu'.$type.'">'.$field[$type].'</span>';
                 } else {
@@ -122,7 +126,7 @@ class completions_uu_progress_tracker {
         }
         echo '</tr>';
         foreach ($this->columns as $col) {
-            $this->_row[$col] = array('normal'=>'', 'info'=>'', 'warning'=>'', 'error'=>'');
+            $this->_row[$col] = array('normal' => '', 'info' => '', 'warning' => '', 'error' => '');
         }
     }
 
@@ -136,7 +140,7 @@ class completions_uu_progress_tracker {
      */
     public function track($col, $msg, $level = 'normal', $merge = true) {
         if (empty($this->_row)) {
-            $this->flush(); //init arrays
+            $this->flush(); // Init arrays.
         }
         if (!in_array($col, $this->columns)) {
             debugging('Incorrect column:'.$col);
@@ -144,7 +148,7 @@ class completions_uu_progress_tracker {
         }
         if ($merge) {
             if ($this->_row[$col][$level] != '') {
-                $this->_row[$col][$level] .='<br />';
+                $this->_row[$col][$level] .= '<br />';
             }
             $this->_row[$col][$level] .= $msg;
         } else {
@@ -156,11 +160,11 @@ class completions_uu_progress_tracker {
      * Print the table end
      * @return void
      */
-    public function close($iid,$filecolumns,$readcount,$mapping, $dateformat, $importing) {
+    public function close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing) {
         $this->flush();
         $filecolumns = implode (',', $filecolumns);
         $text = "Upload Completions";
-        if ($importing==1){
+        if ($importing == 1) {
             $text = "Upload Grades";
         }
         echo '</table>';
@@ -184,7 +188,8 @@ class completions_uu_progress_tracker {
  * @param moodle_url $returnurl return url in case of any error
  * @return array list of fields
  */
-function completions_uu_validate_import_completion_columns(csv_import_reader $cir, $stdfields, $profilefields, moodle_url $returnurl) {
+function completions_uu_validate_import_completion_columns(csv_import_reader $cir, $stdfields,
+                                                           $profilefields, moodle_url $returnurl) {
     $columns = $cir->get_columns();
 
     if (empty($columns)) {
@@ -198,21 +203,21 @@ function completions_uu_validate_import_completion_columns(csv_import_reader $ci
         print_error('csvfewcolumns', 'error', $returnurl);
     }
 
-    // test columns
+    // Test columns.
     $processed = array();
-    foreach ($columns as $key=>$unused) {
+    foreach ($columns as $key => $unused) {
         $field = $columns[$key];
         $lcfield = core_text::strtolower($field);
         if (in_array($field, $stdfields) or in_array($lcfield, $stdfields)) {
-            // standard fields are only lowercase
+            // Standard fields are only lowercase.
             $newfield = $lcfield;
 
         } else if (in_array($field, $profilefields)) {
-            // exact profile field name match - these are case sensitive
+            // Exact profile field name match - these are case sensitive.
             $newfield = $field;
 
         } else if (in_array($lcfield, $profilefields)) {
-            // hack: somebody wrote uppercase in csv file, but the system knows only lowercase profile field
+            // Hack: somebody wrote uppercase in csv file, but the system knows only lowercase profile field.
             $newfield = $lcfield;
 
         } else {
@@ -243,10 +248,10 @@ function completions_uu_increment_username($username) {
     if (!preg_match_all('/(.*?)([0-9]+)$/', $username, $matches)) {
         $username = $username.'2';
     } else {
-        $username = $matches[1][0].($matches[2][0]+1);
+        $username = $matches[1][0] . ($matches[2][0] + 1);
     }
 
-    if ($DB->record_exists('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
+    if ($DB->record_exists('user', array('username' => $username, 'mnethostid' => $CFG->mnet_localhost_id))) {
         return completions_uu_increment_username($username);
     } else {
         return $username;
@@ -261,7 +266,7 @@ function completions_uu_increment_username($username) {
  */
 function completions_uu_process_template($template, $user) {
     if (is_array($template)) {
-        // hack for for support of text editors with format
+        // Hack for for support of text editors with format.
         $t = $template['text'];
     } else {
         $t = $template;
@@ -270,16 +275,16 @@ function completions_uu_process_template($template, $user) {
         return $template;
     }
 
-    $username  = isset($user->username)  ? $user->username  : '';
+    $username  = isset($user->username) ? $user->username : '';
     $firstname = isset($user->firstname) ? $user->firstname : '';
-    $lastname  = isset($user->lastname)  ? $user->lastname  : '';
+    $lastname  = isset($user->lastname) ? $user->lastname : '';
 
     $callback = partial('completions_uu_process_template_callback', $username, $firstname, $lastname);
 
     $result = preg_replace_callback('/(?<!%)%([+-~])?(\d)*([flu])/', $callback, $t);
 
     if (is_null($result)) {
-        return $template; //error during regex processing??
+        return $template; // Error during regex processing.
     }
 
     if (is_array($template)) {
@@ -356,7 +361,7 @@ function completions_uu_supported_auths() {
  * @return array
  */
 function completions_uu_allowed_roles() {
-    // let's cheat a bit, frontpage is guaranteed to exist and has the same list of roles ;-)
+    // Let's cheat a bit, frontpage is guaranteed to exist and has the same list of roles.
     $roles = get_assignable_roles(context_course::instance(SITEID), ROLENAME_ORIGINALANDSHORT);
     return array_reverse($roles, true);
 }
@@ -367,11 +372,11 @@ function completions_uu_allowed_roles() {
  */
 function completions_uu_allowed_roles_cache() {
     $allowedroles = get_assignable_roles(context_course::instance(SITEID), ROLENAME_SHORT);
-    foreach ($allowedroles as $rid=>$rname) {
+    foreach ($allowedroles as $rid => $rname) {
         $rolecache[$rid] = new stdClass();
         $rolecache[$rid]->id   = $rid;
         $rolecache[$rid]->name = $rname;
-        if (!is_numeric($rname)) { // only non-numeric shortnames are supported!!!
+        if (!is_numeric($rname)) { // Only non-numeric shortnames are supported.
             $rolecache[$rname] = new stdClass();
             $rolecache[$rname]->id   = $rid;
             $rolecache[$rname]->name = $rname;
@@ -407,7 +412,7 @@ function completions_uu_allowed_sysroles_cache() {
  */
 function completions_uu_pre_process_custom_profile_data($data) {
     global $CFG, $DB;
-    // find custom profile fields and check if data needs to converted.
+    // Find custom profile fields and check if data needs to converted.
     foreach ($data as $key => $value) {
         if (preg_match('/^profile_field_/', $key)) {
             $shortname = str_replace('profile_field_', '', $key);

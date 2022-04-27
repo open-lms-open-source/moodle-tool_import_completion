@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -46,14 +45,14 @@ $PAGE->set_pagelayout('admin');
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-$STD_FIELDS = array('id', //optional record id
-    'userid', //required moodle user id
-    'course', //required moodle course id for completion record
+$STD_FIELDS = array('id', // Optional record id.
+    'userid', // Required moodle user id.
+    'course', // Required moodle course id for completion record.
     'email',
     'username',
     'timeenrolled',
     'timestarted',
-    'timecompleted', //required timecompleted in timestamp format
+    'timecompleted', // Required timecompleted in timestamp format.
     'reaggregate',
     'dategraded',
     'moduleid',
@@ -62,7 +61,7 @@ $STD_FIELDS = array('id', //optional record id
 
 $PRF_FIELDS = getUserProfileFields();
 
-if(!$uploadcompletion){
+if (!$uploadcompletion) {
     if (empty($iid)) {
         $mform = new admin_import_completion_form();
 
@@ -82,10 +81,10 @@ if(!$uploadcompletion){
                 print_error('csvloaderror', '', $managerurl, $csvloaderror);
             }
 
-            // test if columns ok
+            // Test if columns ok.
             $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
 
-            // continue to form2
+            // Continue to form2.
         } else {
             $PAGE->requires->css('/admin/tool/import_completion/assets/css/style.css');
 
@@ -95,7 +94,8 @@ if(!$uploadcompletion){
 
             echo $renderer->print_upload_warning();
 
-            echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'), 'importcompletion', 'tool_import_completion');
+            echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'),
+                'importcompletion', 'tool_import_completion');
             $mform->display();
 
             echo $OUTPUT->footer();
@@ -105,7 +105,7 @@ if(!$uploadcompletion){
         $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
     }
 
-}else{
+} else {
     $renderer = $PAGE->get_renderer('tool_import_completion');
 
     $uploadedData = uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
@@ -119,7 +119,7 @@ if(!$uploadcompletion){
 }
 
 // Only display this if the file has been loaded.
-if(!empty($iid) && !$uploadcompletion) {
+if (!empty($iid) && !$uploadcompletion) {
 
     echo $OUTPUT->header();
 
