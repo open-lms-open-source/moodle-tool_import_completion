@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use tool_import_completion\output\completion_table;
+
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
@@ -384,14 +386,14 @@ function display_file_data($cir, $importing, $previewrows, $filecolumns, $mappin
     global $DB, $CFG;
 
     $cir->init();
-    $upt = new completions_uu_progress_tracker();
+    $upt = new completion_table();
     $linenum = 1;
     $upt->start($importing); // Start table.
 
     // Modify the columns for different import.
     if ($importing == 1) {
         $upt->columns = array('line', 'id', 'username', 'firstname', 'lastname', 'moduleid',
-            'grade', 'dategraded', 'completiondate');
+            'grade', 'dategraded', 'completiondate', 'status');
     }
     while ($linenum <= $previewrows and $line = $cir->next()) {
 
@@ -401,7 +403,7 @@ function display_file_data($cir, $importing, $previewrows, $filecolumns, $mappin
         foreach ($line as $keynum => $value) {
 
             $key = $filecolumns[$keynum];
-            $user = false;
+
             if ($key == $mapping) {
                 if (strpos($mapping, 'profile_field_') !== false) {
                     $shortname = substr($mapping, 14);
