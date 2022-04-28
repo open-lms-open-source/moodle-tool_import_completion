@@ -45,7 +45,7 @@ $PAGE->set_pagelayout('admin');
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-$STD_FIELDS = array('id', // Optional record id.
+$stdfields = array('id', // Optional record id.
     'userid', // Required moodle user id.
     'course', // Required moodle course id for completion record.
     'email',
@@ -59,7 +59,7 @@ $STD_FIELDS = array('id', // Optional record id.
     'grade'
 );
 
-$PRF_FIELDS = getUserProfileFields();
+$prffields = get_user_profile_fields();
 
 if (!$uploadcompletion) {
     if (empty($iid)) {
@@ -82,7 +82,7 @@ if (!$uploadcompletion) {
             }
 
             // Test if columns ok.
-            $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
+            $filecolumns = completions_uu_validate_import_completion_columns($cir, $stdfields, $prffields, $managerurl);
 
             // Continue to form2.
         } else {
@@ -102,18 +102,18 @@ if (!$uploadcompletion) {
         }
     } else {
         $cir = new csv_import_reader($iid, 'import_completion');
-        $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $managerurl);
+        $filecolumns = uu_validate_user_upload_columns($cir, $stdfields, $prffields, $managerurl);
     }
 
 } else {
     $renderer = $PAGE->get_renderer('tool_import_completion');
 
-    $uploadedData = uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+    $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
 
     echo $OUTPUT->header();
 
-    $total = $uploadedData['totaluploaded'] + $uploadedData['totalupdated'];
-    echo $renderer->print_upload_results($uploadedData);
+    $total = $uploadeddata['totaluploaded'] + $uploadeddata['totalupdated'];
+    echo $renderer->print_upload_results($uploadeddata);
 
     echo $OUTPUT->footer();
 }
@@ -123,7 +123,7 @@ if (!empty($iid) && !$uploadcompletion) {
 
     echo $OUTPUT->header();
 
-    displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
+    display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
 
     echo $OUTPUT->footer();
 

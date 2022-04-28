@@ -50,7 +50,7 @@ class admin_import_completion_form extends moodleform {
         $mform->addElement('select', 'previewrows', get_string('rowpreviewnum', 'tool_import_completion'), $choices);
         $mform->setType('previewrows', PARAM_INT);
 
-        $choices = $this->getAvailableProperties();
+        $choices = $this->get_available_properties();
         $mform->addElement('select', 'mapping', get_string('mapping', 'tool_import_completion'), $choices);
         $mform->setDefault('mapping', 'userid');
 
@@ -66,7 +66,7 @@ class admin_import_completion_form extends moodleform {
         $this->add_action_buttons(false, get_string('importcompletion', 'tool_import_completion'));
     }
 
-    private function getAvailableProperties() {
+    private function get_available_properties() {
         // Will also be used by view to generate available options.
 
         $choices = array();
