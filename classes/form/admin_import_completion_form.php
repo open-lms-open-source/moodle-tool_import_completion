@@ -2,8 +2,8 @@
 
 namespace tool_import_completion\form;
 
+use tool_import_completion\file\csv_settings;
 require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot . '/user/lib.php');
 class admin_import_completion_form extends \moodleform {
 
     /**
@@ -15,13 +15,13 @@ class admin_import_completion_form extends \moodleform {
 
         $mform->addElement('header', 'settingsheader', get_string('upload'));
 
-        $choices = array(0 => 'Completions', 1 => 'Grades');
+        $choices = csv_settings::FILE_TYPE_OPTIONS;
         $mform->addElement('select', 'importing', get_string('importing', 'tool_import_completion'), $choices);
 
         $mform->addElement('filepicker', 'coursecompletionfile', get_string('file'));
         $mform->addRule('coursecompletionfile', null, 'required');
 
-        $choices = \csv_import_reader::get_delimiter_list();
+        $choices = csv_settings::get_file_delimeters();
         $mform->addElement('select', 'delimiter_name', get_string('csvdelimiter', 'tool_import_completion'), $choices);
         if (array_key_exists('cfg', $choices)) {
             $mform->setDefault('delimiter_name', 'cfg');
@@ -31,7 +31,7 @@ class admin_import_completion_form extends \moodleform {
             $mform->setDefault('delimiter_name', 'comma');
         }
 
-        $choices = \core_text::get_encodings();
+        $choices = csv_settings::get_file_encoders();
         $mform->addElement('select', 'encoding', get_string('encoding', 'tool_import_completion'), $choices);
         $mform->setDefault('encoding', 'UTF-8');
 
@@ -39,29 +39,14 @@ class admin_import_completion_form extends \moodleform {
         $mform->addElement('select', 'previewrows', get_string('rowpreviewnum', 'tool_import_completion'), $choices);
         $mform->setType('previewrows', PARAM_INT);
 
-        $choices = $this->get_available_properties();
+        $choices = csv_settings::MAPPING_OPTIONS;
         $mform->addElement('select', 'mapping', get_string('mapping', 'tool_import_completion'), $choices);
         $mform->setDefault('mapping', 'userid');
 
-        $dateformat = array('d/m/Y' => 'd/m/y 30/01/2019',
-            'm/d/Y' => 'm/d/y 01/30/2019',
-            'd-m-Y' => 'd-m-y 30-01-2019',
-            'm-d-Y' => 'm-d-y 01-30-2019',
-            'Y-m-d' => 'Y-m-d 2019-01-01',
-            'Y/m/d' => 'Y/m/d 2019/01/01',
-            'timestamp' => 'timestamp');
+        $dateformat = csv_settings::DATEFORMAT_OPTIONS;
         $mform->addElement('select', 'dateformat', get_string('dateformat', 'tool_import_completion'), $dateformat);
 
         $this->add_action_buttons(false, get_string('importcompletion', 'tool_import_completion'));
     }
 
-    private function get_available_properties() {
-        // Will also be used by view to generate available options.
-
-        $choices = array();
-        $choices['userid'] = 'userid';
-        $choices['username'] = 'username';
-        $choices['email'] = 'email';
-        return $choices;
-    }
 }

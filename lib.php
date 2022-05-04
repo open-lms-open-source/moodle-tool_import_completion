@@ -30,25 +30,6 @@ use tool_import_completion\output\completion_table;
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-function get_user_profile_fields() {
-    global $DB;
-
-    $prffields = array();
-
-    if ($proffields = $DB->get_records('user_info_field')) {
-        foreach ($proffields as $key => $proffield) {
-            $profilefieldname = 'profile_field_'.$proffield->shortname;
-            $prffields[] = $profilefieldname;
-            // Re-index $proffields with key as shortname. This will be
-            // used while checking if profile data is key and needs to be converted (eg. menu profile field).
-            $proffields[$profilefieldname] = $proffield;
-            unset($proffields[$key]);
-        }
-    }
-
-    return $prffields;
-}
-
 function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount) {
     global $DB, $CFG;
     $filecolumns = explode (',', $filecolumns);
@@ -376,7 +357,6 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
         $linenum++;
     }
 
-    purge_all_caches();
     return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalupdated, 'totalerrors' => $totalerror,
         'uploadedcompletions' => $uploadedcompletions, 'moduleCompletions' => $uploadedmodulecompletions,
         'uploadedgrades' => $uploadedgrades, 'totalrecords' => ($linenum - 1));

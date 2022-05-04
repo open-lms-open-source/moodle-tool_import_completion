@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use tool_import_completion\file\csv_helper;
 use tool_import_completion\form\admin_import_completion_form;
 
 require(__DIR__ . '/../../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
 require_once($CFG->libdir . '/csvlib.class.php');
-require_once('locallib.php');
 require_once('lib.php');
 
 $iid         = optional_param('iid', '', PARAM_INT);
@@ -44,22 +43,6 @@ $PAGE->set_pagelayout('admin');
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-$stdfields = array('id', // Optional record id.
-    'userid', // Required moodle user id.
-    'course', // Required moodle course id for completion record.
-    'email',
-    'username',
-    'timeenrolled',
-    'timestarted',
-    'timecompleted', // Required timecompleted in timestamp format.
-    'reaggregate',
-    'dategraded',
-    'moduleid',
-    'grade'
-);
-
-$prffields = get_user_profile_fields();
-
 if (!$uploadcompletion) {
     if (empty($iid)) {
         $mform = new admin_import_completion_form();
@@ -81,7 +64,8 @@ if (!$uploadcompletion) {
             }
 
             // Test if columns ok.
-            $filecolumns = completions_uu_validate_import_completion_columns($cir, $stdfields, $prffields, $managerurl);
+            $helper = new csv_helper();
+            $filecolumns = $helper->validate_csv_columns($cir);
 
             // Continue to form2.
         } else {
@@ -101,7 +85,8 @@ if (!$uploadcompletion) {
         }
     } else {
         $cir = new csv_import_reader($iid, 'import_completion');
-        $filecolumns = uu_validate_user_upload_columns($cir, $stdfields, $prffields, $managerurl);
+        $helper = new csv_helper();
+        $filecolumns = $helper->validate_csv_columns($cir);
     }
 
 } else {
