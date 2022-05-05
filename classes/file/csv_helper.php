@@ -28,11 +28,10 @@ class csv_helper {
     }
 
     /**
-     * Validation callback function - verified the column line of csv file.
+     * Verifies that the columns of csv file can be processed by tool_import_completion plugin.
      * Converts standard column names to lowercase.
      * @param csv_import_reader $cir
-     * @param array $stdfields standard user fields
-     * @return array list of fields
+     * @return array list of columns in the csv file.
      */
     public function validate_csv_columns($cir) {
         return $this->validate_import_completion_columns($cir);
@@ -63,7 +62,7 @@ class csv_helper {
     }
 
     /**
-     * Validation callback function - verified the column line of csv file.
+     * Verified the column line of csv file.
      * Converts standard column names to lowercase.
      * @param csv_import_reader $cir
      * @return array list of fields
@@ -115,6 +114,5 @@ class csv_helper {
         return $processed;
 
     }
-
 
 }

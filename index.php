@@ -16,6 +16,8 @@
 
 use tool_import_completion\file\csv_helper;
 use tool_import_completion\form\admin_import_completion_form;
+use tool_import_completion\event\import_started;
+use tool_import_completion\event\import_finished;
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/csvlib.class.php');
@@ -67,6 +69,16 @@ if (!$uploadcompletion) {
             $helper = new csv_helper();
             $filecolumns = $helper->validate_csv_columns($cir);
 
+            $eventdata = [
+                'context' => $context,
+                'other' => array(
+                    'filecolumns' => implode(',', $filecolumns),
+                    'totallines' => $readcount,
+                )
+            ];
+            $event = import_started::create($eventdata);
+            $event->trigger();
+
             // Continue to form2.
         } else {
             $PAGE->requires->css('/admin/tool/import_completion/assets/css/style.css');
@@ -93,6 +105,18 @@ if (!$uploadcompletion) {
     $renderer = $PAGE->get_renderer('tool_import_completion');
 
     $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+
+    $eventdata = [
+        'context' => $context,
+        'other' => array(
+            'totaluploaded' => $uploadeddata['totaluploaded'],
+            'totalupdated' => $uploadeddata['totalupdated'],
+            'totalerrors' => $uploadeddata['totalerrors'],
+            'totalrecords' => $uploadeddata['totalrecords'],
+        )
+    ];
+    $event = import_finished::create($eventdata);
+    $event->trigger();
 
     echo $OUTPUT->header();
 

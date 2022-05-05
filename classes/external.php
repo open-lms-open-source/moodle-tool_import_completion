@@ -2,6 +2,8 @@
 
 namespace tool_import_completion;
 
+use tool_import_completion\event\import_finished;
+use tool_import_completion\event\import_started;
 use tool_import_completion\file\csv_helper;
 use tool_import_completion\file\csv_settings;
 require_once($CFG->libdir . '/csvlib.class.php');
@@ -18,15 +20,15 @@ class external extends \external_api
         return new \external_function_parameters([
             'file' => new \external_single_structure(
                 [
-                    'filetype' => new \external_value(PARAM_TEXT, 'Import', VALUE_OPTIONAL ),
-                    'filename' => new \external_value(PARAM_TEXT, 'Filename', VALUE_OPTIONAL),
-                    'mapping' => new \external_value(PARAM_TEXT, 'Mapping attribute', VALUE_OPTIONAL),
-                    'dateformat' => new \external_value(PARAM_TEXT, 'Date format', VALUE_OPTIONAL),
-                    'csvdelimiter' => new \external_value(PARAM_TEXT, 'CSV Delimiter', VALUE_OPTIONAL),
-                    'encoder' => new \external_value(PARAM_TEXT, 'Encoding type', VALUE_OPTIONAL),
+                    'filetype' => new \external_value(PARAM_TEXT, 'Type of file to upload. The plugin supports two kinds of file Completions and Grades.' ),
+                    'filename' => new \external_value(PARAM_TEXT, 'Name of the CSV file to import. It is in user\'s private file area.'),
+                    'mapping' => new \external_value(PARAM_TEXT, 'Name of the column to use for mapping the users. It could be userid, username or email'),
+                    'dateformat' => new \external_value(PARAM_TEXT, 'Date format of the date columns in the CSV. It could be d/m/Y, m/d/Y, d-m-Y, m-d-Y, Y-m-d, Y/m/d or timestamp'),
+                    'csvdelimiter' => new \external_value(PARAM_TEXT, 'Delimiter of the CSV file. It could be comma, semicolon, colon or tab'),
+                    'encoder' => new \external_value(PARAM_TEXT, 'Type of the encoding used in the file. Example of supported encodings are UTF-8, ASCII, ISO-8859-1, etc.'),
                 ],
             )
-        ], 'File Object', VALUE_OPTIONAL);
+        ], 'Object that describes all the configuration settings required to import the CSV file in the system.', VALUE_OPTIONAL);
     }
 
     public static function execute_file($rawparams) {
@@ -45,9 +47,7 @@ class external extends \external_api
         $params = self::validate_parameters(self::execute_file_parameters(), $params);
         $badparameters = self::validate_file_parameters($params);
         if (!empty($badparameters)) {
-            var_dump('ERROR');
-            var_dump($badparameters);
-            die();
+            throw new \moodle_exception('error:invalidparameter', 'tool_import_completion', null, implode(',', $badparameters));
         }
         $params['file']['filetype'] = csv_settings::get_filetype_code($params['file']['filetype']);
 
@@ -87,6 +87,16 @@ class external extends \external_api
         $filecolumns = $helper->validate_csv_columns($cir);
         $filecolumns = implode(',', $filecolumns);
 
+        $eventdata = [
+            'context' => $context,
+            'other' => array(
+                'filecolumns' => implode(',', $filecolumns),
+                'totallines' => $readcount,
+            )
+        ];
+        $event = import_started::create($eventdata);
+        $event->trigger();
+
         // Upload the data in the DB.
         $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
 
@@ -98,18 +108,35 @@ class external extends \external_api
             'totalrecords' => $uploadeddata['totalrecords'],
         ];
 
+        $eventdata = [
+            'context' => $context,
+            'other' => array(
+                'totaluploaded' => $uploadeddata['totaluploaded'],
+                'totalupdated' => $uploadeddata['totalupdated'],
+                'totalerrors' => $uploadeddata['totalerrors'],
+                'totalrecords' => $uploadeddata['totalrecords'],
+            )
+        ];
+        $event = import_finished::create($eventdata);
+        $event->trigger();
+
         return $result;
     }
 
     public static function execute_file_returns() {
         return new \external_single_structure([
-            'totaluploaded' => new \external_value(PARAM_INT, ''),
-            'totalupdated' => new \external_value(PARAM_INT, ''),
-            'totalerrors' => new \external_value(PARAM_INT, ''),
-            'totalrecords' => new \external_value(PARAM_INT, '')
+            'totaluploaded' => new \external_value(PARAM_INT, 'Total number of records inserted in the system.'),
+            'totalupdated' => new \external_value(PARAM_INT, 'Total number of records updated in the system.'),
+            'totalerrors' => new \external_value(PARAM_INT,
+                'Total number of records with errors that were not possible to upload/update.'),
+            'totalrecords' => new \external_value(PARAM_INT, 'Total number of records in the original csv file processed.')
         ]);
     }
 
+    /**
+     * @param $params
+     * @return array
+     */
     private static function validate_file_parameters($params) {
         $baddata = [];
         if (!csv_settings::validate_filetype($params['file']['filetype'])) {

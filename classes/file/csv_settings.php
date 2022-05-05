@@ -29,28 +29,52 @@ class csv_settings {
         return \core_text::get_encodings();
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function validate_dateformat($value) {
         return in_array($value, self::DATEFORMAT_OPTIONS);
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function validate_mapping($value) {
         return in_array($value, self::MAPPING_OPTIONS);
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function validate_filetype($value) {
         return in_array($value, self::FILE_TYPE_OPTIONS);
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function validate_delimiter($value) {
         $delimiters = self::get_file_delimeters();
         return array_key_exists($value, $delimiters);
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public static function validate_encoder($value) {
         $encoders = self::get_file_encoders();
         return in_array($value, $encoders);
     }
 
+    /**
+     * @param $value
+     * @return false|int|string
+     */
     public static function get_filetype_code($value) {
         return array_search($value, self::FILE_TYPE_OPTIONS);
     }
