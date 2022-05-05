@@ -30,6 +30,7 @@ class csv_settings {
     }
 
     /**
+     * Validates that the date format is correct
      * @param $value
      * @return bool
      */
@@ -38,6 +39,7 @@ class csv_settings {
     }
 
     /**
+     * * Validates that the mapping value is correct
      * @param $value
      * @return bool
      */
@@ -46,6 +48,7 @@ class csv_settings {
     }
 
     /**
+     * Validates that the filetype is correct
      * @param $value
      * @return bool
      */
@@ -54,6 +57,7 @@ class csv_settings {
     }
 
     /**
+     * Validates that the csv delimiter is correct
      * @param $value
      * @return bool
      */
@@ -63,6 +67,7 @@ class csv_settings {
     }
 
     /**
+     * Validates that the file encoder is correct
      * @param $value
      * @return bool
      */

@@ -23,7 +23,7 @@ $functions = array(
         'methodname'  => 'execute_file',          //external function name,
         'classpath' => '',
         // defaults to the service's externalib.php
-        'description' => 'Executes something.',    //human readable description of the web service function
+        'description' => 'It uses a file uploaded in private file area and upload it to load grades or completions in the platform.',    //human readable description of the web service function
         'type'        => 'write',                  //database rights of the web service function (read, write)
         'ajax' => False,        // is the service available to 'internal' ajax calls.
         'capabilities' => '', // comma separated list of capabilities used by the function.
