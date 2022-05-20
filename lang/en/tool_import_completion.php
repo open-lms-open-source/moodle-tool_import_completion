@@ -19,7 +19,7 @@
  *
  * @package     tool_import_completion
  * @category    string
- * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>
+ * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -67,3 +67,11 @@ $string['itemid'] = 'Item ID';
 $string['grades'] = 'Grades';
 $string['modulecompletions'] = 'Course Module Completions';
 $string['coursecompletions'] = 'Course Completions';
+$string['upload_warning'] = 'WARNING: This plugin will override existing grades/completions.';
+$string['error:invalidparameter'] = 'The request has invalid values in the following fields: {$a}';
+$string['error:nopermission'] = 'The current user has no access to import completion/grades.';
+$string['eventimport_finished'] = 'Import Completion/Grade ended';
+$string['eventimport_finisheddesc'] = 'The process to update Completion/Grade has ended.';
+$string['eventimport_started'] = 'Import Completion/Grade started';
+$string['eventimport_starteddesc'] = 'Usar has uploaded a file in tool_import_completion plugin.';
+$string['import_completion:uploadrecords'] = 'Upload completion/grade csv file to override data.';

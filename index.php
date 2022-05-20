@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require(__DIR__ . '/../../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->libdir . '/csvlib.class.php');
-require_once('course_form.php');
-require_once('locallib.php');
-require_once('lib.php');
+use tool_import_completion\file\csv_helper;
+use tool_import_completion\form\admin_import_completion_form;
+use tool_import_completion\event\import_started;
+use tool_import_completion\event\import_finished;
 
-use tool_import_completion\output;
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/csvlib.class.php');
+require_once('lib.php');
 
 $iid         = optional_param('iid', '', PARAM_INT);
 $previewrows = optional_param('previewrows', 10, PARAM_INT);
@@ -34,32 +33,19 @@ $dateformat = optional_param('dateformat', null, PARAM_RAW);
 $importing = optional_param('importing', 10, PARAM_INT);
 $dataimport = optional_param('dataimport', 0, PARAM_INT);
 
-admin_externalpage_setup('toolimport_completion');
 require_login();
+$context = context_system::instance();
+require_capability('tool/import_completion:uploadrecords', $context);
+$managerurl = new moodle_url('/admin/tool/import_completion/index.php');
 
-defined('MOODLE_INTERNAL') || die();
-
-$returnurl = new moodle_url('/admin/tool/import_completion/index.php');
+$PAGE->set_context($context);
+$PAGE->set_url($managerurl);
+$PAGE->set_pagelayout('admin');
 
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-$STD_FIELDS = array('id', //optional record id
-                    'userid', //required moodle user id
-                    'course', //required moodle course id for completion record
-                    'timeenrolled',
-                    'timestarted',
-                    'timecompleted', //required timecompleted in timestamp format
-                    'reaggregate',
-                    'dategraded',
-                    'moduleid',
-                    'grade'
-);
-
-
-$PRF_FIELDS = getUserProfileFields();
-
-if(!$uploadcompletion){
+if (!$uploadcompletion) {
     if (empty($iid)) {
         $mform = new admin_import_completion_form();
 
@@ -76,44 +62,76 @@ if(!$uploadcompletion){
             unset($content);
 
             if (!is_null($csvloaderror)) {
-                print_error('csvloaderror', '', $returnurl, $csvloaderror);
+                print_error('csvloaderror', '', $managerurl, $csvloaderror);
             }
 
-            // test if columns ok
-            $filecolumns = completions_uu_validate_import_completion_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
+            // Test if columns ok.
+            $helper = new csv_helper();
+            $filecolumns = $helper->validate_csv_columns($cir);
 
-            // continue to form2
+            $eventdata = [
+                'context' => $context,
+                'other' => array(
+                    'filecolumns' => implode(',', $filecolumns),
+                    'totallines' => $readcount,
+                )
+            ];
+            $event = import_started::create($eventdata);
+            $event->trigger();
+
+            // Continue to form2.
         } else {
+            $PAGE->requires->css('/admin/tool/import_completion/assets/css/style.css');
+
             echo $OUTPUT->header();
 
-            echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'), 'importcompletion', 'tool_import_completion');
+            $renderer = $PAGE->get_renderer('tool_import_completion');
+
+            echo $renderer->print_upload_warning();
+
+            echo $OUTPUT->heading_with_help(get_string('importcompletion', 'tool_import_completion'),
+                'importcompletion', 'tool_import_completion');
             $mform->display();
 
             echo $OUTPUT->footer();
         }
     } else {
         $cir = new csv_import_reader($iid, 'import_completion');
-        $filecolumns = uu_validate_user_upload_columns($cir, $STD_FIELDS, $PRF_FIELDS, $returnurl);
+        $helper = new csv_helper();
+        $filecolumns = $helper->validate_csv_columns($cir);
     }
 
-}else{
-    $uploadedData = uploadData($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+} else {
+    $renderer = $PAGE->get_renderer('tool_import_completion');
+
+    $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+
+    $eventdata = [
+        'context' => $context,
+        'other' => array(
+            'totaluploaded' => $uploadeddata['totaluploaded'],
+            'totalupdated' => $uploadeddata['totalupdated'],
+            'totalerrors' => $uploadeddata['totalerrors'],
+            'totalrecords' => $uploadeddata['totalrecords'],
+        )
+    ];
+    $event = import_finished::create($eventdata);
+    $event->trigger();
 
     echo $OUTPUT->header();
 
-    $renderer = $PAGE->get_renderer('tool_import_completion');
-    $total = $uploadedData['totaluploaded'] + $uploadedData['totalupdated'];
-    echo $renderer->print_upload_results($uploadedData);
+    $total = $uploadeddata['totaluploaded'] + $uploadeddata['totalupdated'];
+    echo $renderer->print_upload_results($uploadeddata);
 
     echo $OUTPUT->footer();
 }
 
 // Only display this if the file has been loaded.
-if(!empty($iid) && !$uploadcompletion) {
+if (!empty($iid) && !$uploadcompletion) {
 
     echo $OUTPUT->header();
 
-    displayFileData($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
+    display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
 
     echo $OUTPUT->footer();
 

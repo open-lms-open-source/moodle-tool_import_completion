@@ -15,18 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ *  Import Completion
  *
- * @package     tool_import_completion
- * @category    admin
- * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   tool_import_completion
+ * @copyright 2021 eCreators PTY LTD
+ * @author    Lupiya Mujala <lupiya.mujala@ecreators.com.au>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace tool_import_completion\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'tool_import_completion';
-$plugin->release = '0.1.0';
-$plugin->version = 2022041000;
-$plugin->requires = 2017111300;
-$plugin->maturity = MATURITY_ALPHA;
+class provider implements
+    // This plugin does not store any personal user data.
+    \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

@@ -19,13 +19,15 @@
  *
  * @package     tool_import_completion
  * @category    admin
- * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>
+ * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($hassiteconfig) {
+if (has_capability('tool/import_completion:uploadrecords', context_system::instance())) {
     $ADMIN->add('courses', new admin_externalpage('toolimport_completion',
-        get_string('importcompletion', 'tool_import_completion'), "$CFG->wwwroot/$CFG->admin/tool/import_completion/index.php"));
+        get_string('importcompletion', 'tool_import_completion'),
+        new moodle_url('/admin/tool/import_completion/index.php'),
+        array('tool/import_completion:uploadrecords')));
 }

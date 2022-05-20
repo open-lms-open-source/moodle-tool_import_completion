@@ -19,7 +19,7 @@
  *
  * @package     tool_import_completion
  * @category    string
- * @copyright   2019 Daniel Villareal <daniel@ecreators.com.au>
+ * @author   2019 Daniel Villareal <daniel@ecreators.com.au>, Lupiya Mujala <lupiya.mujala@ecreators.com.au>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -68,3 +68,10 @@ $string['itemid'] = 'ID del Item';
 $string['grades'] = 'Calificaciones';
 $string['modulecompletions'] = 'Finalizaciones del módulo del curso';
 $string['coursecompletions'] = 'Finalizaciones del curso';
+$string['error:invalidparameter'] = 'La petición tiene valores invalidos en los siguientes campos: {$a}';
+$string['error:nopermission'] = 'El usuario no tiene permisos para importar finalizaciones/calificaciones.';
+$string['eventimport_finished'] = 'Proceso de subir finalizaciones/calificaciones terminó';
+$string['eventimport_finisheddesc'] = 'El proceso de actualizar las calificaciones/finalicaciones ha terminado.';
+$string['eventimport_started'] = 'Proceso de subir finalizaciones/calificaciones inició';
+$string['eventimport_starteddesc'] = 'El usuario ha subido un archivo al plugin tool_import_completion.';
+$string['import_completion:uploadrecords'] = 'Subir archivo csv con finalizaciones/calificaciones para sobreescribir los datos..';
