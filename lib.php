@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use tool_import_completion\output\completion_table;
+require_once($CFG->libdir . '/gradelib.php');
 
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
@@ -42,6 +43,7 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
     $uploadedcompletions = array();
     $uploadedmodulecompletions = array();
     $uploadedgrades = array();
+    $upgradecoursegrades = array();
     while ($line = $cir->next()) {
         $userid = 0;
         $course = 0;
@@ -223,11 +225,17 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
                                                         WHERE GG.itemid = :itemid
                                                         AND GG.userid = :userid",
                     array('userid' => $userid, 'itemid' => $gradeitem));
+                $gradeiteminfo = $DB->get_record_sql("SELECT GI.*
+                                                        FROM {grade_items} GI
+                                                        WHERE GI.id = :itemid",
+                    array('userid' => $userid, 'itemid' => $gradeitem));
+                $upgradecoursegrades[$gradeiteminfo->courseid] = $gradeiteminfo->courseid;
                 if ($gradegrade) {
 
                     $gradegrade->finalgrade = $grade;
                     $gradegrade->timecreated = $dategraded;
                     $gradegrade->timemodified = $dategraded;
+                    $gradegrade->overridden = $dategraded;
                     if ($DB->update_record('grade_grades', $gradegrade)) {
                         $timecreated = new DateTime();
                         $timecreated->setTimestamp($gradegrade->timecreated);
@@ -292,6 +300,7 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
                     $gradeupload->finalgrade = $grade;
                     $gradeupload->timecreated = $dategraded;
                     $gradeupload->timemodified = $dategraded;
+                    $gradeupload->overridden = $dategraded;
                     if ($DB->insert_record('grade_grades', $gradeupload)) {
                         $datecreated = new DateTime();
                         $datecreated->setTimestamp($gradeupload->timemodified);
@@ -355,6 +364,14 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
             $totalerror++;
         }
         $linenum++;
+    }
+
+    // Update the final grades of the courses affected by some grades import.
+    if (!empty($upgradecoursegrades)) {
+        foreach ($upgradecoursegrades as $courseid => $val)
+        $coursegradeitem = grade_item::fetch_course_item($courseid);
+        $coursegradeitem->force_regrading();
+        grade_regrade_final_grades($courseid);
     }
 
     return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalupdated, 'totalerrors' => $totalerror,
