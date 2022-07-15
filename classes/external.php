@@ -7,7 +7,7 @@ use tool_import_completion\event\import_started;
 use tool_import_completion\file\csv_helper;
 use tool_import_completion\file\csv_settings;
 require_once($CFG->libdir . '/csvlib.class.php');
-require(__DIR__ . '/../lib.php');
+require_once(__DIR__ . '/../lib.php');
 
 class external extends \external_api
 {
