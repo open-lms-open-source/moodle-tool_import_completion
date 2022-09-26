@@ -98,7 +98,8 @@ class external extends \external_api
         $event->trigger();
 
         // Upload the data in the DB.
-        $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+        // TODO : Check if we want to make course mapping configurable in the external function.
+        $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount, 'course');
 
         // Prepare answer to client.
         $result = [

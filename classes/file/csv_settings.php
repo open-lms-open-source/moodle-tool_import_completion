@@ -11,6 +11,13 @@ class csv_settings {
         'username' => 'username',
         'email' => 'email'];
 
+    const COURSE_MAPPING_OPTIONS =
+        [
+            'course' => 'course',
+            'idnumber' => 'idnumber',
+            'shortname' => 'shortname'
+        ];
+
     const DATEFORMAT_OPTIONS = [
         'd/m/Y' => 'd/m/y 30/01/2019',
         'm/d/Y' => 'm/d/y 01/30/2019',

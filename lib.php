@@ -31,7 +31,7 @@ require_once($CFG->libdir . '/gradelib.php');
 $today = time();
 $today = make_timestamp(date('Y', $today), date('m', $today), date('d', $today), 0, 0, 0);
 
-function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount) {
+function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount, $coursemapping) {
     global $DB, $CFG;
     $filecolumns = explode (',', $filecolumns);
     $linenum = 1;
@@ -83,8 +83,13 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
                     }
                 }
             }
-            if ($key == 'course') {
-                $courses = $DB->get_record("course", array('id' => $value));
+            if ($key == $coursemapping) {
+                if ($coursemapping == 'course') {
+                    $courses = $DB->get_record("course", ['id' => $value]);
+                } else {
+                    $courses = $DB->get_record("course", [$coursemapping => $value]);
+                }
+
                 if ($courses) {
                     $context = context_course::instance($courses->id);
                     if (!is_enrolled($context, $user) && $dataimport == 0) {
@@ -379,7 +384,7 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
         'uploadedgrades' => $uploadedgrades, 'totalrecords' => ($linenum - 1));
 }
 
-function display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount) {
+function display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount, $coursemapping) {
     global $DB, $CFG;
 
     $cir->init();
@@ -427,8 +432,12 @@ function display_file_data($cir, $importing, $previewrows, $filecolumns, $mappin
                     $upt->track('status', get_string('usernotfound', 'tool_import_completion'), 'normal');
                 }
             }
-            if ($key == 'course') {
-                $course = $DB->get_record("course", array('id' => $value));
+            if ($key == $coursemapping) {
+                if ($coursemapping == 'course') {
+                    $course = $DB->get_record("course", ['id' => $value]);
+                } else {
+                    $course = $DB->get_record("course", [$coursemapping => $value]);
+                }
                 if ($course) {
                     $context = context_course::instance($course->id);
                     if (!is_enrolled($context, $user)) {
@@ -497,5 +506,5 @@ function display_file_data($cir, $importing, $previewrows, $filecolumns, $mappin
         $linenum++;
 
     }
-    $upt->close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing);
+    $upt->close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing, $coursemapping);
 }

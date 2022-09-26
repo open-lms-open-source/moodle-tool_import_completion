@@ -43,6 +43,10 @@ class admin_import_completion_form extends \moodleform {
         $mform->addElement('select', 'mapping', get_string('mapping', 'tool_import_completion'), $choices);
         $mform->setDefault('mapping', 'userid');
 
+        $choices = csv_settings::COURSE_MAPPING_OPTIONS;
+        $mform->addElement('select', 'coursemapping', get_string('coursemapping', 'tool_import_completion'), $choices);
+        $mform->setDefault('coursemapping', 'courseid');
+
         $dateformat = csv_settings::DATEFORMAT_OPTIONS;
         $mform->addElement('select', 'dateformat', get_string('dateformat', 'tool_import_completion'), $dateformat);
 

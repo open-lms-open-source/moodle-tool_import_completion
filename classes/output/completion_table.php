@@ -110,7 +110,7 @@ class completion_table {
      * Print the table end
      * @return void
      */
-    public function close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing) {
+    public function close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing, $coursemapping) {
         $this->flush();
         $filecolumns = implode (',', $filecolumns);
         $text = "Upload Completions";
@@ -122,6 +122,7 @@ class completion_table {
         echo "<input type ='hidden' name='filecolumns' value={$filecolumns}>";
         echo "<input type ='hidden' name='readcount' value={$readcount}>";
         echo "<input type ='hidden' name='mapping' value={$mapping}>";
+        echo "<input type ='hidden' name='coursemapping' value={$coursemapping}>";
         echo "<input type ='hidden' name='dateformat' value={$dateformat}>";
         echo "<input type ='hidden' name='dataimport' value={$importing}>";
         echo "<input type ='submit' class='btn btn-primary' name='uploadcompletion' value='{$text}'>";

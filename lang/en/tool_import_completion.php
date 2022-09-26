@@ -76,3 +76,4 @@ $string['eventimport_started'] = 'Import Completion/Grade started';
 $string['eventimport_starteddesc'] = 'Usar has uploaded a file in tool_import_completion plugin.';
 $string['import_completion:uploadrecords'] = 'Upload completion/grade csv file to override data.';
 $string['privacy:metadata'] = 'Completion import does not store user data.';
+$string['coursemapping'] = 'Course mapping';

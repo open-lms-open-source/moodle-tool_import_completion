@@ -29,6 +29,7 @@ $uploadcompletion = optional_param('uploadcompletion', null, PARAM_RAW);
 $filecolumns = optional_param('filecolumns', null, PARAM_RAW);
 $readcount = optional_param('readcount', 0, PARAM_INT);
 $mapping = optional_param('mapping', null, PARAM_RAW);
+$coursemapping = optional_param('coursemapping', null, PARAM_RAW);
 $dateformat = optional_param('dateformat', null, PARAM_RAW);
 $importing = optional_param('importing', 10, PARAM_INT);
 $dataimport = optional_param('dataimport', 0, PARAM_INT);
@@ -104,7 +105,7 @@ if (!$uploadcompletion) {
 } else {
     $renderer = $PAGE->get_renderer('tool_import_completion');
 
-    $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount);
+    $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount, $coursemapping);
 
     $eventdata = [
         'context' => $context,
@@ -131,7 +132,7 @@ if (!empty($iid) && !$uploadcompletion) {
 
     echo $OUTPUT->header();
 
-    display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount);
+    display_file_data($cir, $importing, $previewrows, $filecolumns, $mapping, $dateformat, $iid, $readcount, $coursemapping);
 
     echo $OUTPUT->footer();
 
