@@ -96,7 +96,7 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
                         $error = true;
                         $course = $value. " [Not enrolled]";
                     } else {
-                        $course = $value;
+                        $course = $courses->id;
                     }
 
                 } else {
@@ -443,7 +443,9 @@ function display_file_data($cir, $importing, $previewrows, $filecolumns, $mappin
                     if (!is_enrolled($context, $user)) {
                         $upt->track('status', get_string('usernotenrolled', 'tool_import_completion'), 'normal');
                     } else {
-                        $upt->track($key, $course->fullname, 'normal');
+                        $upt->track('course', $course->fullname, 'normal');
+                        $upt->track('idnumber', $course->idnumber, 'normal');
+                        $upt->track('shortname', $course->shortname, 'normal');
                     }
 
                 } else {

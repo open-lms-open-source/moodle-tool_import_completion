@@ -5,7 +5,7 @@ namespace tool_import_completion\output;
 class completion_table {
 
     private $_row;
-    public $columns = array('line', 'id', 'username', 'firstname', 'lastname', 'course',
+    public $columns = array('line', 'id', 'username', 'firstname', 'lastname', 'course', 'idnumber', 'shortname',
         'completiondate', 'status', 'grade', 'moduleid', 'dategraded');
 
 
@@ -26,6 +26,8 @@ class completion_table {
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('lastname').'</th>';
         if ($importing == 0) {
             echo '<th class="header c'.$ci++.'" scope="col">'.get_string('course').'</th>';
+            echo '<th class="header c'.$ci++.'" scope="col">'.get_string('idnumber').'</th>';
+            echo '<th class="header c'.$ci++.'" scope="col">'.get_string('shortname').'</th>';
             echo '<th class="header c' . $ci++ . '" scope="col">' .
                 get_string('completiondate', 'tool_import_completion') . '</th>';
             echo '<th class="header c' . $ci++ . '" scope="col">' . get_string('status', 'tool_import_completion') . '</th>';

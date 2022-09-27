@@ -10,6 +10,8 @@ class csv_helper {
         'id', // Optional record id.
         'userid', // Required moodle user id.
         'course', // Required moodle course id for completion record.
+        'idnumber',
+        'shortname',
         'email',
         'username',
         'timeenrolled',
