@@ -51,6 +51,7 @@ if (!$uploadcompletion) {
         $mform = new admin_import_completion_form();
 
         if ($formdata = $mform->get_data()) {
+            require_sesskey();
             $iid = csv_import_reader::get_new_iid('import_completion');
             $cir = new csv_import_reader($iid, 'import_completion');
 
@@ -82,8 +83,6 @@ if (!$uploadcompletion) {
 
             // Continue to form2.
         } else {
-            $PAGE->requires->css('/admin/tool/import_completion/assets/css/style.css');
-
             echo $OUTPUT->header();
 
             $renderer = $PAGE->get_renderer('tool_import_completion');
@@ -103,6 +102,7 @@ if (!$uploadcompletion) {
     }
 
 } else {
+    require_sesskey();
     $renderer = $PAGE->get_renderer('tool_import_completion');
 
     $uploadeddata = upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $readcount, $coursemapping);

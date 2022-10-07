@@ -20,7 +20,7 @@ class completion_table {
             get_string('uploadusersresult', 'tool_uploaduser').'">';
         echo '<tr class="heading r0">';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('uucsvline', 'tool_import_completion').'</th>';
-        echo '<th class="header c'.$ci++.'" scope="col">ID</th>';
+        echo '<th class="header c'.$ci++.'" scope="col">'.get_string('userid', 'tool_import_completion').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('username').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('firstname').'</th>';
         echo '<th class="header c'.$ci++.'" scope="col">'.get_string('lastname').'</th>';
@@ -115,10 +115,11 @@ class completion_table {
     public function close($iid, $filecolumns, $readcount, $mapping, $dateformat, $importing, $coursemapping) {
         $this->flush();
         $filecolumns = implode (',', $filecolumns);
-        $text = "Upload Completions";
+        $text = get_string('uploadcompletions', 'tool_import_completion');
         if ($importing == 1) {
-            $text = "Upload Grades";
+            $text = get_string('uploadgrades', 'tool_import_grades');
         }
+        $sesskey = sesskey();
         echo '</table>';
         echo "<input type ='hidden' name='iid' value={$iid}>";
         echo "<input type ='hidden' name='filecolumns' value={$filecolumns}>";
@@ -127,6 +128,7 @@ class completion_table {
         echo "<input type ='hidden' name='coursemapping' value={$coursemapping}>";
         echo "<input type ='hidden' name='dateformat' value={$dateformat}>";
         echo "<input type ='hidden' name='dataimport' value={$importing}>";
+        echo "<input type ='hidden' name='sesskey' value='{$sesskey}'>";
         echo "<input type ='submit' class='btn btn-primary' name='uploadcompletion' value='{$text}'>";
         echo '</form>';
     }
