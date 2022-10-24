@@ -187,8 +187,15 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
             } else {
                 try {
                     $type = \tool_import_completion\importcompletionlib::set_grade_coursemodule($userid, $gradeitem, $grade, $dategraded);
+                    $upgradecoursegrades[] = $DB->get_field('grade_items', 'courseid', ['id' => $gradeitem]);
                     $totalupdated++;
-                    $uploadedgrades[] = ['userid' => $userid, 'gradeitem' => $gradeitem, 'finalgrade' => $grade];
+                    $uploadedgrades[] = [
+                        'userid' => $userid,
+                        'itemid' => $gradeitem,
+                        'finalgrade' => $grade,
+                        'type' => $type,
+                        'timecreatedstring' => userdate($dategraded)
+                    ];
                 } catch (Exception $exception) {
                     $totalerror++;
                 }
@@ -196,8 +203,8 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
                 // Update course module completion if time completed is added.
                 if ($timecompleted > 0) {
                     try {
-                        \tool_import_completion\importcompletionlib::set_course_module_completed($userid, $moduleid, $timecompleted);
-                        $uploadedmodulecompletions[]  = ['userid' => $userid, 'coursemoduleid' => $moduleid];
+                        $type = \tool_import_completion\importcompletionlib::set_course_module_completed($userid, $moduleid, $timecompleted);
+                        $uploadedmodulecompletions[]  = ['userid' => $userid, 'coursemoduleid' => $moduleid, 'type' => $type, 'timemodifiedstring' => userdate($timecompleted)];
                         $totaluploaded++;
                     } catch (Exception $exception) {
                         $totalerror++;
@@ -212,10 +219,11 @@ function upload_data($filecolumns, $iid, $mapping, $dataimport, $dateformat, $re
 
     // Update the final grades of the courses affected by some grades import.
     if (!empty($upgradecoursegrades)) {
-        foreach ($upgradecoursegrades as $courseid => $val)
-        $coursegradeitem = grade_item::fetch_course_item($courseid);
-        $coursegradeitem->force_regrading();
-        grade_regrade_final_grades($courseid);
+        foreach ($upgradecoursegrades as $courseid) {
+            $coursegradeitem = grade_item::fetch_course_item($courseid);
+            $coursegradeitem->force_regrading();
+            grade_regrade_final_grades($courseid);
+        }
     }
 
     return array('totaluploaded' => $totaluploaded, 'totalupdated' => $totalupdated, 'totalerrors' => $totalerror,

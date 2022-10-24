@@ -117,7 +117,7 @@ class completion_table {
         $filecolumns = implode (',', $filecolumns);
         $text = get_string('uploadcompletions', 'tool_import_completion');
         if ($importing == 1) {
-            $text = get_string('uploadgrades', 'tool_import_grades');
+            $text = get_string('uploadgrades', 'tool_import_completion');
         }
         $sesskey = sesskey();
         echo '</table>';
